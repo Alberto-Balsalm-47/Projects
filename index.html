@@ -1593,7 +1593,7 @@ document.addEventListener("click", e => {
     const s = fig.dataset.src;
     pl.outerHTML = fig.dataset.kind === "clip"
       ? `<video src="${s}" controls autoplay playsinline></video>`
-      : `<iframe src="${s}" title="" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+      : `<iframe src="${s}" title="${pl.getAttribute("aria-label")}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
     return;
   }
   const o = e.target.closest("[data-open]");
