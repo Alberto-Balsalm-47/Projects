@@ -1,0 +1,3 @@
+Los PDF de referencia van acá, con los nombres que indica el README.
+Con FUENTES_LOCALES = false esta carpeta puede quedar vacía: los
+enlaces usan el lugar público de cada fuente.
