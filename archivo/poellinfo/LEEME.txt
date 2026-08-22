@@ -1,3 +1,17 @@
 Imágenes y clips del archivo @poellinfo.
 Los cuatro .mp4 que cita la ficha se cargan siempre desde acá:
   10 (1).mp4 · 15 (1).mp4 · 28 (1).mp4 · 35 (1).mp4
+
+Selección curada de 9 imágenes para la sección 04 Técnica, una por
+entrada citada con "POELLINFO c. N" en esa sección exclusivamente
+(evita ambigüedad: las citas de otras secciones agregan varios
+números a la vez y no permiten saber cuál corresponde a cuál):
+  5-transparent-leather.jpg    · Transparente
+  9-prosthetic-eyes.jpg        · Prótesis craneofaciales
+  10-prosthetic-gloves.jpg     · Prótesis de titanio
+  14-perforated-leather.jpg    · Perforación
+  16-self-edge.jpg              · Self-Edge
+  19-bag.jpg                    · Bolsos
+  26-tornado-pants.jpg          · Tornado / Spiral
+  27-injected-dye.jpg           · Tinte inyectado
+  32-drip-rubber.jpg            · Calzado (Drip)
