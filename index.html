@@ -15,13 +15,16 @@
 
 :root {
   --type: "Faxfont Standard", "Courier New", Courier, monospace;
+  --serif: "Times New Roman", Times, Georgia, serif;
   --bg: #ffffff;
-  --fg: #000000;
-  --dim: #767676;
-  --lnk: #0000ee;
-  --vis: #551a8b;
-  --line: #bbbbbb;
-  --line2: #e2e2e2;
+  --fg: #050505;
+  --fg2: #3a3a3a;
+  --dim: #6e6e6e;
+  --lnk: #2e2e2e;
+  --vis: #6e6e6e;
+  --line: #141414;
+  --line2: #dcdcdc;
+  --stripe: #f4f4f4;
   --ind: clamp(1.2rem, 8vw, 7rem);
   --measure: 68ch;
   --bar: 3px;
@@ -30,12 +33,33 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
+    --lnk: #f2f2ee; --vis: #a8a8a2;
+    --line: #47463e; --line2: #221f18;
+    --stripe: #121210;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
+  --lnk: #f2f2ee; --vis: #a8a8a2;
+  --line: #47463e; --line2: #221f18;
+  --stripe: #121210;
+}
+
+/* La portada queda ajena al rediseño de la ficha: misma paleta que siempre. */
+body:not([data-view="ccp"]) {
+  --bg: #ffffff; --fg: #000000; --dim: #767676;
+  --lnk: #0000ee; --vis: #551a8b;
+  --line: #bbbbbb; --line2: #e2e2e2;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) body:not([data-view="ccp"]) {
     --bg: #0a0a0a; --fg: #d2d0cb; --dim: #77746f;
     --lnk: #ece9e3; --vis: #8f8b84;
     --line: #2e2e2c; --line2: #1c1c1b;
   }
 }
-:root[data-theme="dark"] {
+html[data-theme="dark"] body:not([data-view="ccp"]) {
   --bg: #0a0a0a; --fg: #d2d0cb; --dim: #77746f;
   --lnk: #ece9e3; --vis: #8f8b84;
   --line: #2e2e2c; --line2: #1c1c1b;
@@ -58,7 +82,8 @@ body {
   height: var(--bar); background: var(--line2);
 }
 .progress i {
-  display: block; height: 100%; width: 0%; background: var(--dim);
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(to right, var(--dim), var(--fg));
   transition: width .1s linear;
 }
 body:not([data-view="ccp"]) .progress { visibility: hidden; }
@@ -106,14 +131,28 @@ a.designer:hover, a.designer:focus-visible {
 }
 .designer.pending { color: var(--dim); font-weight: 400; }
 
-/* ===================== FICHA ===================== */
-.file a { color: var(--lnk); }
+/* ===================== FICHA =====================
+   Voz en serif (WIRED); lo utilitario —números, códigos,
+   etiquetas, citas— vuelve a Courier New con .mono.        */
+.file {
+  font-family: var(--serif); font-weight: 400;
+  letter-spacing: 0; line-height: 1.7;
+}
+.file a { color: var(--lnk); text-decoration: underline; text-underline-offset: 2px; }
 .file a:visited { color: var(--vis); }
+.file a:hover { color: var(--fg); }
+.mono, .back, .masthead .dek, .idxbar, .sec > h2, .b h3, .b dt, .b .ref,
+.b .anat .code, .b .colors b, .b .sources .sg, .links, .vid figcaption,
+.b th { font-family: var(--type); font-weight: 700; letter-spacing: 0.005em; }
 .pad { padding-left: var(--ind); padding-right: clamp(1.1rem, 4vw, 3rem); }
-.back { font-weight: 400; font-size: 0.8em; margin: 0; padding-top: 2.6rem; }
+.back { font-size: 0.8em; margin: 0; padding-top: 2.6rem; }
 .masthead { padding: 1.2rem 0 2.4rem; max-width: 72ch; }
-.masthead h1 { font-size: clamp(1.1em, 4.4vw, 1.9em); line-height: 1.25; margin: 0 0 0.5rem; letter-spacing: 0.01em; }
-.masthead .dek { font-weight: 400; font-size: 0.8em; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); margin: 0; }
+.masthead h1 {
+  font-size: clamp(1.3em, 5vw, 2.3em); line-height: 1.2; margin: 0; letter-spacing: 0;
+  background: linear-gradient(100deg, var(--fg) 35%, var(--fg2) 70%, var(--dim));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.masthead .dek { display: none; }
 
 /* ---------- índice horizontal ---------- */
 .idxbar {
@@ -163,7 +202,12 @@ a.designer:hover, a.designer:focus-visible {
 
 /* ---------- contenido ---------- */
 .body { padding-top: 2.6rem; padding-bottom: 8rem; }
-.sec > h2 { font-size: 1.15em; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 1.6rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); max-width: 96ch; }
+.sec > h2 {
+  font-size: 1.15em; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 1.6rem;
+  padding-bottom: 0.6rem; max-width: 96ch;
+  border-bottom: 1px solid transparent;
+  border-image: linear-gradient(to right, var(--fg), var(--line) 55%, transparent) 1;
+}
 .sec > h2 .n { font-weight: 400; color: var(--dim); margin-right: 1.2ch; }
 .r-cont .sec { padding-bottom: 4.5rem; scroll-margin-top: calc(var(--bar) + var(--set) + var(--idx) + 1rem); }
 .r-one .nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-weight: 400; font-size: 0.85em; max-width: 96ch; }
@@ -172,7 +216,7 @@ a.designer:hover, a.designer:focus-visible {
 .r-one .nav button:disabled { color: var(--dim); text-decoration: none; cursor: default; }
 
 /* bloques */
-.b h3 { font-size: 0.8em; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); margin: 2.4rem 0 1rem; }
+.b h3 { font-size: 0.8em; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg2); margin: 2.4rem 0 1rem; }
 .b p { margin: 0 0 1rem; max-width: var(--measure); }
 .b .note { font-weight: 400; color: var(--dim); max-width: var(--measure); border-left: 1px solid var(--line); padding-left: 1rem; margin: 1.6rem 0 0; }
 .b .ref { font-weight: 400; font-size: 0.8em; letter-spacing: 0.04em; color: var(--dim); }
@@ -180,16 +224,17 @@ a.designer:hover, a.designer:focus-visible {
 .b dl { margin: 0; max-width: 96ch; }
 .b dl > div { padding: 0.9rem 0; border-top: 1px solid var(--line2); }
 .b dl > div:first-child { border-top: 0; padding-top: 0; }
-.b dt { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.86em; margin-bottom: 0.25rem; }
+.b dt { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.82em; margin-bottom: 0.25rem; }
 .b dd { margin: 0; max-width: var(--measure); font-weight: 400; }
 .b dd .ref { display: block; margin-top: 0.3rem; }
 .b .scroll { overflow-x: auto; margin: 0.4rem 0 1.3rem; max-width: 96ch; }
 .b table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
 .b th, .b td { border: 1px solid var(--line); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
-.b th { font-weight: 400; font-size: 0.82em; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+.b th { font-weight: 400; font-size: 0.82em; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); background: var(--stripe); }
 .b td { font-weight: 400; }
 .b td:first-child { font-weight: 700; }
-.b table.tl td:first-child { font-weight: 400; color: var(--dim); white-space: nowrap; font-size: 0.9em; }
+.b tbody tr:nth-child(even) td { background: var(--stripe); }
+.b table.tl td:first-child { font-family: var(--type); font-weight: 700; color: var(--dim); white-space: nowrap; font-size: 0.82em; }
 .b table.tl td:nth-child(2) { font-weight: 700; }
 .b .anat { margin: 0.4rem 0 1.3rem; }
 .b .anat .code { font-size: clamp(0.95em, 3.2vw, 1.35em); letter-spacing: 0.04em; margin-bottom: 1rem; }
@@ -205,8 +250,6 @@ a.designer:hover, a.designer:focus-visible {
 .links h3 { margin: 0 0 0.8rem; }
 .links ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(28ch, 1fr)); gap: 0.15rem 1.6rem; }
 .links li { font-weight: 400; font-size: 0.88em; }
-.links a { text-decoration: none; }
-.links a:hover { text-decoration: underline; }
 .links .ar { color: var(--dim); margin-right: 0.8ch; }
 .links a[data-local="1"] { color: var(--dim); }
 .links a[data-local="1"]:hover { color: var(--fg); }
@@ -217,7 +260,7 @@ a.designer:hover, a.designer:focus-visible {
 .vid { margin: 0; }
 .vid .play {
   position: relative; display: block; width: 100%; aspect-ratio: 16/9; padding: 0; cursor: pointer;
-  background: #000; border: 1px solid var(--line);
+  background: radial-gradient(ellipse at center, #1c1c1c, #000 75%); border: 1px solid var(--line);
   transition: border-color .14s ease;
 }
 .vid .play:hover { border-color: var(--fg); }
