@@ -28,8 +28,10 @@ lo decide `FUENTES_LOCALES`, arriba de todo en `index.html`:
 
 **`false` (como está ahora).** Los enlaces van al lugar público de cada
 fuente: Internet Archive para *Fashion Now 2* y *Landed–Geland* (con la
-página exacta), la editorial para Lehmann, el perfil de @poellinfo para
-el archivo de imágenes. No hace falta subir nada.
+página exacta), la editorial para Lehmann, HAL (repositorio académico de
+acceso abierto) para el capítulo de Michel, un flipbook público de Yumpu
+para el editorial de FLUX, el perfil de @poellinfo para el archivo de
+imágenes. No hace falta subir nada.
 
 **`true`.** Los enlaces van a los archivos de este repositorio, con
 `#page=` — la página exacta en los seis PDF. Para eso hay que copiar los
