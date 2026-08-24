@@ -123,8 +123,10 @@ body:not([data-view="ccp"]) .progress { visibility: hidden; }
 .margin-glitch canvas {
   display: block; width: 100%; height: 100%;
   /* mismas marcas, mismo tamaño — sólo el trazo se ablanda,
-     de gráfico duro a mancha, sin tocar dimensiones ni densidad. */
+     de gráfico duro a mancha, sin tocar dimensiones ni densidad.
+     opacity baja la intensidad visual sin tocar forma ni tamaño. */
   filter: blur(1.1px);
+  opacity: 0.55;
 }
 
 /* ---- configuración ---- */
