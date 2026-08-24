@@ -16,12 +16,20 @@
 :root {
   --type: "Faxfont Standard", "Courier New", Courier, monospace;
   --bg: #ffffff;
-  --fg: #000000;
-  --dim: #767676;
-  --lnk: #0000ee;
-  --vis: #551a8b;
-  --line: #bbbbbb;
-  --line2: #e2e2e2;
+  --fg: #050505;
+  --fg2: #3a3a3a;
+  --dim: #6e6e6e;
+  --lnk: #2e2e2e;
+  --vis: #6e6e6e;
+  --line: #141414;
+  --line2: #dcdcdc;
+  --wash-hi: rgba(255,255,255,.6);
+  --wash-top: #dedad0; --wash-mid: #8f8b81; --wash-bot: #141210;
+  --wash-text: #0a0906;
+  /* el glitch usa la paleta del tema contrario — una fuga hacia el
+     otro estado, no una variación del mismo.                     */
+  --glitch-top: #4f4b3f; --glitch-mid: #211e18; --glitch-bot: #060606;
+  --glitch-mark: #f5f2ea;
   --ind: clamp(1.2rem, 8vw, 7rem);
   --measure: 68ch;
   --bar: 3px;
@@ -30,12 +38,41 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
+    --lnk: #f2f2ee; --vis: #a8a8a2;
+    --line: #47463e; --line2: #221f18;
+    --wash-hi: rgba(255,255,255,.08);
+    --wash-top: #4f4b3f; --wash-mid: #211e18; --wash-bot: #060606;
+    --wash-text: #f5f2ea;
+    --glitch-top: #dedad0; --glitch-mid: #8f8b81; --glitch-bot: #141210;
+    --glitch-mark: #0a0906;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
+  --lnk: #f2f2ee; --vis: #a8a8a2;
+  --line: #47463e; --line2: #221f18;
+  --wash-hi: rgba(255,255,255,.08);
+  --wash-top: #4f4b3f; --wash-mid: #211e18; --wash-bot: #060606;
+  --wash-text: #f5f2ea;
+  --glitch-top: #dedad0; --glitch-mid: #8f8b81; --glitch-bot: #141210;
+  --glitch-mark: #0a0906;
+}
+
+/* La portada queda ajena al rediseño de la ficha: misma paleta que siempre. */
+body:not([data-view="ccp"]) {
+  --bg: #ffffff; --fg: #000000; --dim: #767676;
+  --lnk: #0000ee; --vis: #551a8b;
+  --line: #bbbbbb; --line2: #e2e2e2;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) body:not([data-view="ccp"]) {
     --bg: #0a0a0a; --fg: #d2d0cb; --dim: #77746f;
     --lnk: #ece9e3; --vis: #8f8b84;
     --line: #2e2e2c; --line2: #1c1c1b;
   }
 }
-:root[data-theme="dark"] {
+html[data-theme="dark"] body:not([data-view="ccp"]) {
   --bg: #0a0a0a; --fg: #d2d0cb; --dim: #77746f;
   --lnk: #ece9e3; --vis: #8f8b84;
   --line: #2e2e2c; --line2: #1c1c1b;
@@ -51,6 +88,15 @@ body {
 :focus-visible { outline: 2px solid var(--fg); outline-offset: -3px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition-duration: .01ms !important; } }
 
+/* grano de papel viejo sobre toda la ficha, no sólo la franja del
+   nombre — para que el documento entero se sienta material y usado,
+   no una pantalla nueva.                                          */
+body[data-view="ccp"]::before {
+  content: ""; position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  opacity: 0.4; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 
 /* ---- progreso de lectura ---- */
 .progress {
@@ -58,10 +104,28 @@ body {
   height: var(--bar); background: var(--line2);
 }
 .progress i {
-  display: block; height: 100%; width: 0%; background: var(--dim);
+  display: block; height: 100%; width: 0%;
+  background: linear-gradient(to right, var(--dim), var(--fg));
   transition: width .1s linear;
 }
 body:not([data-view="ccp"]) .progress { visibility: hidden; }
+
+/* estática en el margen derecho: sólo aparece donde sobra ancho,
+   corre a lo largo de todo el documento (no fija al viewport) para
+   acompañar el desarrollo entero de la ficha al bajar.            */
+.margin-glitch { display: none; }
+@media (min-width: 1500px) {
+  body[data-view="ccp"] .margin-glitch {
+    display: block; position: absolute; top: 0; right: 0;
+    z-index: 1; pointer-events: none; overflow: hidden;
+  }
+}
+.margin-glitch canvas {
+  display: block; width: 100%; height: 100%;
+  /* mismas marcas, mismo tamaño — sólo el trazo se ablanda,
+     de gráfico duro a mancha, sin tocar dimensiones ni densidad. */
+  filter: blur(1.1px);
+}
 
 /* ---- configuración ---- */
 .settings {
@@ -106,14 +170,36 @@ a.designer:hover, a.designer:focus-visible {
 }
 .designer.pending { color: var(--dim); font-weight: 400; }
 
-/* ===================== FICHA ===================== */
-.file a { color: var(--lnk); }
+/* ===================== FICHA =====================
+   Tipografía original en todo el texto: Courier New Bold,
+   heredada de body, sin excepciones.                        */
+.file a { color: var(--lnk); text-decoration: underline; text-underline-offset: 2px; }
 .file a:visited { color: var(--vis); }
+.file a:hover { color: var(--fg); }
 .pad { padding-left: var(--ind); padding-right: clamp(1.1rem, 4vw, 3rem); }
-.back { font-weight: 400; font-size: 0.8em; margin: 0; padding-top: 2.6rem; }
-.masthead { padding: 1.2rem 0 2.4rem; max-width: 72ch; }
-.masthead h1 { font-size: clamp(1.1em, 4.4vw, 1.9em); line-height: 1.25; margin: 0 0 0.5rem; letter-spacing: 0.01em; }
-.masthead .dek { font-weight: 400; font-size: 0.8em; letter-spacing: 0.16em; text-transform: uppercase; color: var(--dim); margin: 0; }
+.back { font-size: 0.8em; margin: 0; padding-top: 2.6rem; }
+
+/* franja del nombre: veladura vertical + grano, como el acabado
+   de las fotos de referencia (yeso metalizado degradado). A sangre:
+   cancela el padding de .pad y lo repone por dentro.               */
+.masthead {
+  position: relative; overflow: hidden;
+  margin: 1.6rem calc(-1 * clamp(1.1rem, 4vw, 3rem)) 0 calc(-1 * var(--ind));
+  padding: clamp(2.4rem, 9vh, 4.5rem) clamp(1.1rem, 4vw, 3rem) clamp(2.4rem, 9vh, 4.5rem) var(--ind);
+  background:
+    radial-gradient(120% 90% at 20% 0%, var(--wash-hi), transparent 60%),
+    linear-gradient(to bottom, var(--wash-top), var(--wash-mid) 55%, var(--wash-bot));
+}
+.masthead::before {
+  content: ""; position: absolute; inset: 0; opacity: 0.5; mix-blend-mode: overlay; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.masthead h1 {
+  position: relative; z-index: 1; max-width: 72ch;
+  font-size: clamp(1.3em, 5vw, 2.3em); line-height: 1.2; margin: 0; letter-spacing: 0;
+  color: var(--wash-text);
+}
+.masthead .dek { display: none; }
 
 /* ---------- índice horizontal ---------- */
 .idxbar {
@@ -163,7 +249,10 @@ a.designer:hover, a.designer:focus-visible {
 
 /* ---------- contenido ---------- */
 .body { padding-top: 2.6rem; padding-bottom: 8rem; }
-.sec > h2 { font-size: 1.15em; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 1.6rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--line); max-width: 96ch; }
+.sec > h2 {
+  font-size: 1.15em; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 1.6rem;
+  padding-bottom: 0.6rem; max-width: 96ch; border-bottom: 1px solid var(--line);
+}
 .sec > h2 .n { font-weight: 400; color: var(--dim); margin-right: 1.2ch; }
 .r-cont .sec { padding-bottom: 4.5rem; scroll-margin-top: calc(var(--bar) + var(--set) + var(--idx) + 1rem); }
 .r-one .nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-weight: 400; font-size: 0.85em; max-width: 96ch; }
@@ -171,8 +260,18 @@ a.designer:hover, a.designer:focus-visible {
 .r-one .nav button:last-child { text-align: right; }
 .r-one .nav button:disabled { color: var(--dim); text-decoration: none; cursor: default; }
 
+/* distorsión sobre el texto explicativo, acompañando la estática
+   del margen — una tira del párrafo se repite corrida, como un
+   desajuste de fotocopiadora, sin tapar el texto real debajo.     */
+.glitch-line { position: relative; }
+.glitch-line::before, .glitch-line::after {
+  content: attr(data-glitch); position: absolute; inset: 0; pointer-events: none; color: var(--glitch-mark);
+}
+.glitch-line::before { clip-path: polygon(0 8%, 100% 8%, 100% 34%, 0 34%); transform: translate(-4px, 0); opacity: 0.65; }
+.glitch-line::after { clip-path: polygon(0 52%, 100% 52%, 100% 78%, 0 78%); transform: translate(4px, 0); opacity: 0.65; }
+
 /* bloques */
-.b h3 { font-size: 0.8em; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--dim); margin: 2.4rem 0 1rem; }
+.b h3 { font-size: 0.8em; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg2); margin: 2.4rem 0 1rem; }
 .b p { margin: 0 0 1rem; max-width: var(--measure); }
 .b .note { font-weight: 400; color: var(--dim); max-width: var(--measure); border-left: 1px solid var(--line); padding-left: 1rem; margin: 1.6rem 0 0; }
 .b .ref { font-weight: 400; font-size: 0.8em; letter-spacing: 0.04em; color: var(--dim); }
@@ -180,7 +279,7 @@ a.designer:hover, a.designer:focus-visible {
 .b dl { margin: 0; max-width: 96ch; }
 .b dl > div { padding: 0.9rem 0; border-top: 1px solid var(--line2); }
 .b dl > div:first-child { border-top: 0; padding-top: 0; }
-.b dt { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.86em; margin-bottom: 0.25rem; }
+.b dt { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.82em; margin-bottom: 0.25rem; }
 .b dd { margin: 0; max-width: var(--measure); font-weight: 400; }
 .b dd .ref { display: block; margin-top: 0.3rem; }
 .b .scroll { overflow-x: auto; margin: 0.4rem 0 1.3rem; max-width: 96ch; }
@@ -189,7 +288,7 @@ a.designer:hover, a.designer:focus-visible {
 .b th { font-weight: 400; font-size: 0.82em; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
 .b td { font-weight: 400; }
 .b td:first-child { font-weight: 700; }
-.b table.tl td:first-child { font-weight: 400; color: var(--dim); white-space: nowrap; font-size: 0.9em; }
+.b table.tl td:first-child { font-family: var(--type); font-weight: 700; color: var(--dim); white-space: nowrap; font-size: 0.82em; }
 .b table.tl td:nth-child(2) { font-weight: 700; }
 .b .anat { margin: 0.4rem 0 1.3rem; }
 .b .anat .code { font-size: clamp(0.95em, 3.2vw, 1.35em); letter-spacing: 0.04em; margin-bottom: 1rem; }
@@ -205,8 +304,6 @@ a.designer:hover, a.designer:focus-visible {
 .links h3 { margin: 0 0 0.8rem; }
 .links ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(28ch, 1fr)); gap: 0.15rem 1.6rem; }
 .links li { font-weight: 400; font-size: 0.88em; }
-.links a { text-decoration: none; }
-.links a:hover { text-decoration: underline; }
 .links .ar { color: var(--dim); margin-right: 0.8ch; }
 .links a[data-local="1"] { color: var(--dim); }
 .links a[data-local="1"]:hover { color: var(--fg); }
@@ -217,7 +314,7 @@ a.designer:hover, a.designer:focus-visible {
 .vid { margin: 0; }
 .vid .play {
   position: relative; display: block; width: 100%; aspect-ratio: 16/9; padding: 0; cursor: pointer;
-  background: #000; border: 1px solid var(--line);
+  background: radial-gradient(ellipse at center, #1c1c1c, #000 75%); border: 1px solid var(--line);
   transition: border-color .14s ease;
 }
 .vid .play:hover { border-color: var(--fg); }
@@ -235,7 +332,8 @@ a.designer:hover, a.designer:focus-visible {
 .vid figcaption a:hover { color: var(--fg); }
 
 .b dd .ex { display: block; margin-top: 0.8rem; max-width: 16rem; }
-.b dd .ex img { display: block; width: 100%; border: 1px solid var(--line); }
+.b dd .ex img { display: block; width: 100%; border: 1px solid var(--line); filter: grayscale(.15) contrast(1.02); transition: filter .5s ease-in-out, transform .5s ease-in-out; }
+.b dd .ex:hover img { filter: grayscale(0) contrast(1.05); transform: scale(1.015); }
 .b dd .ex figcaption { font-weight: 400; font-size: 0.78em; color: var(--dim); margin-top: 0.35rem; }
 .b dd .ex figcaption a { color: inherit; text-decoration: none; }
 .b dd .ex figcaption a:hover { color: var(--fg); }
@@ -254,6 +352,7 @@ a.designer:hover, a.designer:focus-visible {
 <body>
 
 <div class="progress" aria-hidden="true"><i></i></div>
+<div class="margin-glitch" aria-hidden="true"></div>
 
 <p class="settings">
   <span>
@@ -1390,7 +1489,7 @@ const LINKS = {
 };
 
 /* ---- estado ---- */
-let lang = "es", theme = "auto", view = "index";
+let lang = "en", theme = "dark", view = "index";
 const idx = "nums", read = "cont";   // decidido: Números + Continua
 let cur = 0;
 
@@ -1547,13 +1646,171 @@ function paint(top) {
     b.setAttribute("aria-pressed", String(b.dataset.theme === theme));
   });
 
+  const el = document.getElementById("view");
   const y = top ? 0 : window.scrollY;
-  document.getElementById("view").innerHTML = view === "index" ? cover() : file();
+  el.innerHTML = view === "index" ? cover() : file();
   window.scrollTo({ top: y, behavior: "instant" });
   spy();
   centerStrip();
   progress();
+  drawMarginGlitch();
+  applyTextGlitch();
 }
+
+/* ---- glitch del margen derecho --------------------------------
+   En pantallas anchas sobra franja a la derecha del texto: en vez
+   de dejarla en blanco, como si el sitio nunca se terminó de
+   maquetar para eso, se llena de estática — barras que se
+   disuelven (paleta de la tercera foto) más bloques desplazados y
+   fragmentos reales del documento (fechas, citas, códigos de
+   cuero), como en la segunda foto de referencia.               */
+function hexA(hex, a) {
+  const h = hex.replace("#", "");
+  const n = h.length === 3 ? h.split("").map(c => c + c).join("") : h;
+  const r = parseInt(n.slice(0, 2), 16), g = parseInt(n.slice(2, 4), 16), b = parseInt(n.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+/* la paleta del glitch vive en --glitch-* (definida junto a --wash-*
+   en :root): siempre la del tema contrario al que está activo, para
+   que esa franja se vea como una fuga hacia el otro estado.        */
+function invertedGlitchPalette() {
+  const cs = getComputedStyle(document.documentElement);
+  return {
+    top: cs.getPropertyValue("--glitch-top").trim(),
+    mid: cs.getPropertyValue("--glitch-mid").trim(),
+    bot: cs.getPropertyValue("--glitch-bot").trim(),
+    text: cs.getPropertyValue("--glitch-mark").trim()
+  };
+}
+/* trazo recto, ángulo al azar — sin letras, sólo marca. */
+function drawStroke(ctx, x0, y0, len, color, lw) {
+  const angle = (Math.random() - 0.5) * 0.9;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.beginPath();
+  ctx.moveTo(x0, y0);
+  ctx.lineTo(x0 + Math.sin(angle) * len, y0 + Math.cos(angle) * len);
+  ctx.stroke();
+}
+/* plan al azar por visita: cuánto ocupa y dónde se concentra —
+   distinto cada vez que se entra al sitio, no siempre el mismo bloque. */
+const glitchPlan = {
+  widthFrac: 0.25 + Math.random() * 0.7,   // qué fracción del ancho disponible usa
+  bias: Math.random(),                      // 0 = se concentra arriba, 1 = abajo
+  spread: 0.35 + Math.random() * 0.9,       // qué tan repartido queda
+};
+function drawMarginGlitch() {
+  const wrap = document.querySelector(".margin-glitch");
+  if (!wrap) return;
+  if (view !== "ccp" || getComputedStyle(wrap).display === "none") { wrap.innerHTML = ""; wrap.style.clipPath = ""; return; }
+  // ancho disponible según el viewport, pero la porción que realmente
+  // se usa cambia con glitchPlan — a veces angosto, a veces casi todo.
+  const maxAvail = Math.min(360, Math.max(0, (window.innerWidth - 1300) / 2 + 90));
+  wrap.style.width = Math.round(60 + maxAvail * glitchPlan.widthFrac) + "px";
+  const rect = wrap.getBoundingClientRect();
+  const docH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+  wrap.style.height = docH + "px";
+  if (rect.width < 4 || docH < 4) return;
+  let canvas = wrap.querySelector("canvas");
+  if (!canvas) { canvas = document.createElement("canvas"); wrap.appendChild(canvas); }
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  canvas.width = Math.max(1, Math.round(rect.width * dpr));
+  canvas.height = Math.max(1, Math.round(docH * dpr));
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const w = rect.width, h = docH;
+  const pal = invertedGlitchPalette();
+  const fg = pal.text, wtop = pal.top, wmid = pal.mid, wbot = pal.bot;
+  const density = y => Math.max(0.1, 1 - Math.abs(y / h - glitchPlan.bias) / glitchPlan.spread);
+
+  // veladura de fondo con los mismos tonos de la franja del nombre,
+  // en tramos repetidos para que un documento largo no se diluya;
+  // le da al panel el mismo peso visual que tenía antes de aligerarlo.
+  const band = 1200;
+  for (let y = 0; y < h; y += band) {
+    const bh = Math.min(band, h - y);
+    const grad = ctx.createLinearGradient(0, y, 0, y + bh);
+    grad.addColorStop(0, wtop); grad.addColorStop(0.55, wmid); grad.addColorStop(1, wbot);
+    ctx.fillStyle = grad;
+    ctx.globalAlpha = 0.42 + density(y + bh / 2) * 0.34;
+    ctx.fillRect(0, y, w, bh);
+  }
+  ctx.globalAlpha = 1;
+
+  const pts = [];
+  let ex = 15 + Math.random() * 20;
+  for (let y = 0; y <= 100; y += 4 + Math.random() * 8) {
+    ex = Math.max(0, Math.min(85, ex + (Math.random() - 0.5) * 50 * density(y / 100 * h)));
+    pts.push(`${ex.toFixed(1)}% ${y.toFixed(1)}%`);
+  }
+  wrap.style.clipPath = `polygon(${pts.join(",")}, 100% 100%, 100% 0%)`;
+
+  // barras verticales que gotean, más densas donde marca el plan
+  const cols = Math.max(20, Math.round((w * (h / 900)) / 9));
+  for (let i = 0; i < cols; i++) {
+    const y0 = Math.random() * h;
+    if (Math.random() > density(y0)) continue;
+    const x = Math.random() * w;
+    const dripH = 50 + Math.random() * h * 0.28;
+    const bw = 2 + Math.random() * (w * 0.14);
+    const grad = ctx.createLinearGradient(0, y0, 0, y0 + dripH);
+    grad.addColorStop(0, hexA(fg, 0.6));
+    grad.addColorStop(1, hexA(fg, 0));
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, y0, bw, dripH);
+  }
+
+  // bloques desplazados / distorsión, como un dato corrupto
+  const blocks = Math.round(h / 80);
+  for (let i = 0; i < blocks; i++) {
+    const by = Math.random() * h;
+    if (Math.random() > density(by)) continue;
+    const bh = 4 + Math.random() * 46;
+    const off = (Math.random() - 0.5) * w * 0.7;
+    ctx.fillStyle = hexA(fg, 0.14 + Math.random() * 0.27);
+    ctx.fillRect(off, by, w * (0.5 + Math.random() * 0.8), bh);
+    if (Math.random() < 0.5) {
+      ctx.fillStyle = hexA(fg, 0.38);
+      ctx.fillRect(0, by + bh * 0.4, w, 1 + Math.random() * 3);
+    }
+  }
+
+  // trazos rectos sueltos, ángulo al azar — sin ondas, sin letras
+  const strokes = Math.round(h / 130);
+  for (let i = 0; i < strokes; i++) {
+    const y0 = Math.random() * h;
+    if (Math.random() > density(y0)) continue;
+    const x = 8 + Math.random() * Math.max(1, w - 16);
+    drawStroke(ctx, x, y0, 60 + Math.random() * 160, hexA(fg, 0.22 + Math.random() * 0.3), 1 + Math.random() * 1.4);
+  }
+}
+let glitchResizeT;
+window.addEventListener("resize", () => {
+  clearTimeout(glitchResizeT);
+  glitchResizeT = setTimeout(() => { drawMarginGlitch(); applyTextGlitch(); }, 200);
+}, { passive: true });
+
+/* la distorsión del margen se lleva al propio texto explicativo:
+   un puñado de párrafos, elegidos al azar en cada visita, se
+   duplican corridos por dentro. Sólo cuando hay estática que
+   acompañar (misma condición de ancho que el margen).             */
+function applyTextGlitch() {
+  document.querySelectorAll(".glitch-line").forEach(el => {
+    el.classList.remove("glitch-line");
+    delete el.dataset.glitch;
+  });
+  if (view !== "ccp" || window.innerWidth < 1500) return;
+  const candidates = [...document.querySelectorAll(".b p, .b dd")].filter(el =>
+    el.textContent.trim().length > 30 && !el.querySelector(".ex"));
+  const n = Math.min(candidates.length, 3 + Math.floor(Math.random() * 4));
+  for (let i = 0; i < n; i++) {
+    const el = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
+    if (!el) continue;
+    el.dataset.glitch = el.textContent;
+    el.classList.add("glitch-line");
+  }
+}
+
 
 /* barra de progreso de lectura, sólo en la ficha */
 function progress() {
@@ -1646,6 +1903,9 @@ window.addEventListener("resize", progress, { passive: true });
 view = location.hash.replace("#", "") === "ccp" ? "ccp" : "index";
 paint(true);
 onScroll();
+// primer layout real: si el ancho aún no estaba resuelto en el
+// paint síncrono inicial, esto lo vuelve a intentar una vez.
+requestAnimationFrame(() => { drawMarginGlitch(); applyTextGlitch(); });
 </script>
 
 </body>
