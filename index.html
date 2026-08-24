@@ -19,62 +19,50 @@
   --fg: #050505;
   --fg2: #3a3a3a;
   --dim: #6e6e6e;
-  --lnk: #2e2e2e;
-  --vis: #6e6e6e;
+  /* ancla clásica de navegador: azul, igual en toda la página —
+     ficha y portada, claro y oscuro — y se mantiene igual visitada. */
+  --lnk: #0000ee;
   --line: #141414;
   --line2: #dcdcdc;
-  --wash-hi: rgba(255,255,255,.6);
-  --wash-top: #dedad0; --wash-mid: #8f8b81; --wash-bot: #141210;
-  --wash-text: #0a0906;
   /* el glitch usa la paleta del tema contrario — una fuga hacia el
      otro estado, no una variación del mismo.                     */
   --glitch-top: #4f4b3f; --glitch-mid: #211e18; --glitch-bot: #060606;
   --glitch-mark: #f5f2ea;
-  --ind: clamp(1.2rem, 8vw, 7rem);
   --measure: 68ch;
-  --bar: 3px;
   --set: 46px;      /* franja de configuración */
-  --idx: 44px;      /* índice horizontal */
+  --side: 320px;    /* índice lateral */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
-    --lnk: #f2f2ee; --vis: #a8a8a2;
+    --lnk: #6d93ff;
     --line: #47463e; --line2: #221f18;
-    --wash-hi: rgba(255,255,255,.08);
-    --wash-top: #4f4b3f; --wash-mid: #211e18; --wash-bot: #060606;
-    --wash-text: #f5f2ea;
     --glitch-top: #dedad0; --glitch-mid: #8f8b81; --glitch-bot: #141210;
     --glitch-mark: #0a0906;
   }
 }
 :root[data-theme="dark"] {
   --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
-  --lnk: #f2f2ee; --vis: #a8a8a2;
+  --lnk: #6d93ff;
   --line: #47463e; --line2: #221f18;
-  --wash-hi: rgba(255,255,255,.08);
-  --wash-top: #4f4b3f; --wash-mid: #211e18; --wash-bot: #060606;
-  --wash-text: #f5f2ea;
   --glitch-top: #dedad0; --glitch-mid: #8f8b81; --glitch-bot: #141210;
   --glitch-mark: #0a0906;
 }
 
-/* La portada queda ajena al rediseño de la ficha: misma paleta que siempre. */
+/* La portada queda ajena al rediseño de la ficha: misma paleta que siempre
+   (el ancla azul ya es la misma en todos lados, ver --lnk arriba).       */
 body:not([data-view="ccp"]) {
   --bg: #ffffff; --fg: #000000; --dim: #767676;
-  --lnk: #0000ee; --vis: #551a8b;
   --line: #bbbbbb; --line2: #e2e2e2;
 }
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) body:not([data-view="ccp"]) {
     --bg: #0a0a0a; --fg: #d2d0cb; --dim: #77746f;
-    --lnk: #ece9e3; --vis: #8f8b84;
     --line: #2e2e2c; --line2: #1c1c1b;
   }
 }
 html[data-theme="dark"] body:not([data-view="ccp"]) {
   --bg: #0a0a0a; --fg: #d2d0cb; --dim: #77746f;
-  --lnk: #ece9e3; --vis: #8f8b84;
   --line: #2e2e2c; --line2: #1c1c1b;
 }
 
@@ -91,31 +79,22 @@ body {
 /* grano de papel viejo sobre toda la ficha, no sólo la franja del
    nombre — para que el documento entero se sienta material y usado,
    no una pantalla nueva.                                          */
-body[data-view="ccp"]::before {
+/* el mismo grano cubre también la portada, pero apenas insinuado —
+   la ficha lo lleva a plena intensidad, la portada lo roza.        */
+body::before {
   content: ""; position: fixed; inset: 0; z-index: 2; pointer-events: none;
-  opacity: 0.4; mix-blend-mode: overlay;
+  opacity: 0.06; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+body[data-view="ccp"]::before { opacity: 0.4; }
 
-
-/* ---- progreso de lectura ---- */
-.progress {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 51;
-  height: var(--bar); background: var(--line2);
-}
-.progress i {
-  display: block; height: 100%; width: 0%;
-  background: linear-gradient(to right, var(--dim), var(--fg));
-  transition: width .1s linear;
-}
-body:not([data-view="ccp"]) .progress { visibility: hidden; }
 
 /* estática en el margen derecho: sólo aparece donde sobra ancho,
    corre a lo largo de todo el documento (no fija al viewport) para
    acompañar el desarrollo entero de la ficha al bajar.            */
 .margin-glitch { display: none; }
 @media (min-width: 1500px) {
-  body[data-view="ccp"] .margin-glitch {
+  body[data-view="ccp"] .margin-glitch, body[data-view="index"] .margin-glitch {
     display: block; position: absolute; top: 0; right: 0;
     z-index: 1; pointer-events: none; overflow: hidden;
   }
@@ -128,10 +107,12 @@ body:not([data-view="ccp"]) .progress { visibility: hidden; }
   filter: blur(1.1px);
   opacity: 0.55;
 }
+/* en la portada la misma estática, casi apagada */
+body[data-view="index"] .margin-glitch canvas { opacity: 0.1; filter: blur(1.8px); }
 
 /* ---- configuración ---- */
 .settings {
-  position: fixed; top: var(--bar); left: 0; right: 0; z-index: 50;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
   height: var(--set); margin: 0; padding: 0 clamp(1.1rem, 4vw, 3rem);
   display: flex; align-items: center; justify-content: flex-end;
   background: var(--bg); border-bottom: 1px solid transparent;
@@ -147,120 +128,100 @@ body[data-scrolled] .settings { border-bottom-color: var(--line); }
 .settings button[aria-pressed="true"] { color: var(--fg); text-decoration: none; cursor: default; font-weight: 700; }
 .settings .sep { margin: 0 0.5em; }
 
-#view { padding-top: calc(var(--bar) + var(--set)); }
+#view { padding-top: var(--set); }
 
-/* ===================== PORTADA ===================== */
-.cover { min-height: calc(100vh - var(--bar) - var(--set)); display: flex; flex-direction: column; justify-content: center; }
+/* ===================== PORTADA =====================
+   Texto ancla llano, sin animación ni bloques de hover: una lista
+   como cualquier nav de sitio viejo, arrancando arriba a la
+   izquierda, no flotando centrada en la pantalla.                 */
+.cover {
+  min-height: calc(100vh - var(--set));
+  padding: clamp(2.2rem, 8vh, 4rem) clamp(1.1rem, 4vw, 3rem);
+}
 .cover .title {
-  font-weight: 400; font-size: 0.8em; letter-spacing: 0.34em; text-transform: uppercase;
-  color: var(--dim); text-align: center; margin: 0;
-  padding: 0 1.1rem clamp(2.4rem, 9vh, 5.5rem);
+  font-weight: 700; font-size: 0.85em; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--dim); text-align: left; margin: 0 0 1.3rem;
 }
-.list { border-top: 1px solid var(--line); }
+.list { border-top: 0; display: block; max-width: 46ch; }
 .designer {
-  display: block; width: 100%; text-decoration: none; color: var(--fg);
-  border-bottom: 1px solid var(--line);
-  padding: clamp(1.4rem, 4.5vh, 2.6rem) clamp(1.1rem, 4vw, 3rem);
-  padding-left: var(--ind);
-  font-size: clamp(1.05em, 3.8vw, 2em); line-height: 1.2; letter-spacing: 0.01em;
-  transition: background .14s ease, color .14s ease, padding-left .2s ease;
+  display: block; width: auto; color: var(--lnk); text-decoration: underline;
+  text-underline-offset: 2px; border-bottom: 0;
+  padding: 0.12rem 0; font-size: 1.05em; line-height: 1.85; letter-spacing: 0;
 }
-a.designer:visited { color: var(--fg); }
-a.designer:hover, a.designer:focus-visible {
-  background: var(--fg); color: var(--bg);
-  padding-left: calc(var(--ind) + clamp(0.5rem, 1.8vw, 1.4rem));
-}
-.designer.pending { color: var(--dim); font-weight: 400; }
+a.designer:hover, a.designer:focus-visible { color: var(--fg); }
+.designer.pending { display: block; padding: 0.12rem 0; line-height: 1.85; color: var(--dim); font-weight: 400; text-decoration: none; }
 
 /* ===================== FICHA =====================
    Tipografía original en todo el texto: Courier New Bold,
    heredada de body, sin excepciones.                        */
 .file a { color: var(--lnk); text-decoration: underline; text-underline-offset: 2px; }
-.file a:visited { color: var(--vis); }
 .file a:hover { color: var(--fg); }
-.pad { padding-left: var(--ind); padding-right: clamp(1.1rem, 4vw, 3rem); }
-.back { font-size: 0.8em; margin: 0; padding-top: 2.6rem; }
+.pad { padding-left: clamp(1.1rem, 4vw, 3rem); padding-right: clamp(1.1rem, 4vw, 3rem); }
 
-/* franja del nombre: veladura vertical + grano, como el acabado
-   de las fotos de referencia (yeso metalizado degradado). A sangre:
-   cancela el padding de .pad y lo repone por dentro.               */
-.masthead {
-  position: relative; overflow: hidden;
-  margin: 1.6rem calc(-1 * clamp(1.1rem, 4vw, 3rem)) 0 calc(-1 * var(--ind));
-  padding: clamp(2.4rem, 9vh, 4.5rem) clamp(1.1rem, 4vw, 3rem) clamp(2.4rem, 9vh, 4.5rem) var(--ind);
-  background:
-    radial-gradient(120% 90% at 20% 0%, var(--wash-hi), transparent 60%),
-    linear-gradient(to bottom, var(--wash-top), var(--wash-mid) 55%, var(--wash-bot));
-}
-.masthead::before {
-  content: ""; position: absolute; inset: 0; opacity: 0.5; mix-blend-mode: overlay; pointer-events: none; z-index: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+/* sin veladura ni grano propio — el nombre queda llano, en
+   mayúscula, sin la placa metalizada que tenía antes.              */
+.masthead { margin: 1.6rem 0 0; padding: 0; }
 .masthead h1 {
-  position: relative; z-index: 1; max-width: 72ch;
-  font-size: clamp(1.3em, 5vw, 2.3em); line-height: 1.2; margin: 0; letter-spacing: 0;
-  color: var(--wash-text);
+  max-width: 72ch; text-transform: uppercase; font-weight: 700;
+  font-size: clamp(1.4em, 5vw, 2.4em); line-height: 1.2; margin: 0; letter-spacing: 0.02em;
+  color: var(--fg);
 }
 .masthead .dek { display: none; }
 
-/* ---------- índice horizontal ---------- */
+/* ---------- índice lateral ----------
+   Del lado izquierdo, estático (nada de sticky-scroll ni barridos
+   de hover), texto ancla real. En pantalla angosta se apila arriba
+   del contenido, sin posicionamiento fijo.                        */
+.layout { display: block; }
 .idxbar {
-  position: sticky; top: calc(var(--bar) + var(--set)); z-index: 40;
-  background: var(--bg);
   border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 1rem clamp(1.1rem, 4vw, 3rem);
 }
-.idxbar .strip {
-  display: flex; align-items: stretch;
-  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+.idxbar .idx-home {
+  display: block; margin-bottom: 1rem; font-weight: 700; font-size: 0.85em;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--lnk); text-decoration: underline;
 }
-.idxbar .strip::-webkit-scrollbar { display: none; }
-.idxbar button {
-  font: inherit; background: none; color: var(--fg); border: 0;
-  cursor: pointer; white-space: nowrap;
-  display: flex; align-items: center; gap: 1ch;
-  transition: background .12s ease, color .12s ease;
+.idxbar .idx-home:hover { color: var(--fg); }
+.idxbar .strip { list-style: none; margin: 0; padding: 0; }
+.idxbar .strip li + li { margin-top: 0.15rem; }
+.idxbar .strip a {
+  display: block; color: var(--lnk); text-decoration: underline; text-underline-offset: 2px; padding: 0.3rem 0;
+  font-size: 0.92em; line-height: 1.4;
 }
-.idxbar button .n { font-weight: 400; color: var(--dim); }
-.idxbar button:hover { background: var(--fg); color: var(--bg); }
-.idxbar button:hover .n { color: var(--bg); }
-.idxbar button[aria-current="true"] { background: var(--fg); color: var(--bg); }
-.idxbar button[aria-current="true"] .n { color: var(--bg); }
+.idxbar .strip a .n { font-weight: 400; margin-right: 1ch; }
+.idxbar .strip a:hover { color: var(--fg); }
+.idxbar .strip a[aria-current="true"] { font-weight: 700; }
 
-/* A · inline — una línea corrida, se scrollea sola */
-.i-inline .strip { padding: 0 clamp(1.1rem, 4vw, 3rem) 0 var(--ind); gap: 0; }
-.i-inline button { padding: 0.7rem 1.1ch; font-size: 0.85em; }
-.i-inline button + button { margin-left: 1.6ch; }
-
-/* B · celdas — a sangre, divididas por filete */
-.i-cells .strip { padding: 0; }
-.i-cells button {
-  flex: 1 0 auto; min-width: 15ch; justify-content: flex-start;
-  padding: 0.75rem 1ch; font-size: 0.82em;
-  border-right: 1px solid var(--line2);
-}
-.i-cells button:last-child { border-right: 0; }
-
-/* C · números — sólo la cifra, el nombre aparece al lado */
-.i-nums .strip { padding: 0 clamp(1.1rem, 4vw, 3rem) 0 var(--ind); align-items: center; }
-.i-nums button { padding: 0.7rem 0.9ch; font-weight: 400; color: var(--dim); font-size: 0.9em; }
-.i-nums button[aria-current="true"] { font-weight: 700; }
-.i-nums .now {
-  margin-left: 1.6ch; padding-left: 1.6ch; border-left: 1px solid var(--line2);
-  font-size: 0.85em; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+@media (min-width: 900px) {
+  .layout { display: grid; grid-template-columns: var(--side) 1fr; align-items: start; gap: 0 clamp(1.5rem, 3vw, 3rem); position: relative; }
+  /* la línea que separa el índice del texto ya no se corta al pie
+     de la lista: corre todo el largo de la ficha, como un cuadro,
+     apenas insinuada y con la misma estática que el margen derecho
+     en vez de un filete limpio.                                   */
+  .layout::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: var(--side);
+    width: 3px; pointer-events: none; opacity: 0.16; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E"),
+      linear-gradient(var(--fg), var(--fg));
+  }
+  .idxbar {
+    grid-column: 1; position: sticky; top: calc(var(--set) + 1.6rem);
+    border-top: 0; border-bottom: 0;
+    padding: 1.6rem clamp(1rem, 1.6vw, 1.8rem) 2rem clamp(1.1rem, 4vw, 3rem);
+  }
+  /* mucho más larga: cada entrada respira, en vez de apretarse en
+     una columna corta con scroll propio.                          */
+  .idxbar .strip a { padding: 1.05rem 0; font-size: 1.02em; line-height: 1.5; }
 }
 
 /* ---------- contenido ---------- */
-.body { padding-top: 2.6rem; padding-bottom: 8rem; }
+.body { padding-top: 2.6rem; padding-bottom: 8rem; grid-column: 2; }
 .sec > h2 {
-  font-size: 1.15em; letter-spacing: 0.06em; text-transform: uppercase; margin: 0 0 1.6rem;
-  padding-bottom: 0.6rem; max-width: 96ch; border-bottom: 1px solid var(--line);
+  font-size: 1.5em; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 2rem;
+  max-width: 96ch;
 }
 .sec > h2 .n { font-weight: 400; color: var(--dim); margin-right: 1.2ch; }
-.r-cont .sec { padding-bottom: 4.5rem; scroll-margin-top: calc(var(--bar) + var(--set) + var(--idx) + 1rem); }
-.r-one .nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 3.5rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-weight: 400; font-size: 0.85em; max-width: 96ch; }
-.r-one .nav button { font: inherit; background: none; border: 0; color: var(--lnk); text-decoration: underline; cursor: pointer; padding: 0; text-align: left; }
-.r-one .nav button:last-child { text-align: right; }
-.r-one .nav button:disabled { color: var(--dim); text-decoration: none; cursor: default; }
+.sec { padding-bottom: 4.5rem; scroll-margin-top: calc(var(--set) + 1rem); }
 
 /* distorsión sobre el texto explicativo, acompañando la estática
    del margen — una tira del párrafo se repite corrida, como un
@@ -271,19 +232,26 @@ a.designer:hover, a.designer:focus-visible {
 }
 .glitch-line::before { clip-path: polygon(0 8%, 100% 8%, 100% 34%, 0 34%); transform: translate(-4px, 0); opacity: 0.65; }
 .glitch-line::after { clip-path: polygon(0 52%, 100% 52%, 100% 78%, 0 78%); transform: translate(4px, 0); opacity: 0.65; }
+/* en la portada, el mismo desajuste pero casi apagado */
+body[data-view="index"] .glitch-line::before, body[data-view="index"] .glitch-line::after { opacity: 0.1; }
 
-/* bloques */
-.b h3 { font-size: 0.8em; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg2); margin: 2.4rem 0 1rem; }
-.b p { margin: 0 0 1rem; max-width: var(--measure); }
-.b .note { font-weight: 400; color: var(--dim); max-width: var(--measure); border-left: 1px solid var(--line); padding-left: 1rem; margin: 1.6rem 0 0; }
-.b .ref { font-weight: 400; font-size: 0.8em; letter-spacing: 0.04em; color: var(--dim); }
-.b .note .ref { display: block; margin-top: 0.4rem; }
-.b dl { margin: 0; max-width: 96ch; }
-.b dl > div { padding: 0.9rem 0; border-top: 1px solid var(--line2); }
-.b dl > div:first-child { border-top: 0; padding-top: 0; }
-.b dt { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.82em; margin-bottom: 0.25rem; }
-.b dd { margin: 0; max-width: var(--measure); font-weight: 400; }
-.b dd .ref { display: block; margin-top: 0.3rem; }
+/* bloques — títulos en negrita y más grandes; el desarrollo de cada
+   entrada lleva una viñeta sutil en vez del filete que separaba
+   antes; el espacio entre entradas hace el trabajo que hacía la
+   línea.                                                          */
+.b h3 { font-size: 1.1em; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fg); margin: 2.8rem 0 1.1rem; }
+.b p:not(.note) { margin: 0 0 1rem; max-width: var(--measure); padding-left: 1.15em; text-indent: -1.15em; }
+.b p:not(.note)::before { content: "– "; color: var(--dim); }
+.b .note { font-weight: 400; color: var(--dim); max-width: var(--measure); padding-left: 1rem; margin: 1.6rem 0 0; }
+/* la columna es real: en pantalla ancha, las entradas de cada tema
+   se acomodan en dos columnas de diario, no en una sola tira larga. */
+.b dl { margin: 0; max-width: 96ch; column-width: 22rem; column-gap: 2.2rem; }
+.b dl > div { padding: 0; margin: 1.7rem 0 0; break-inside: avoid; }
+.b dl > div:first-child { margin-top: 0; }
+.b dt { text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.82em; margin-bottom: 0.3rem; }
+/* la viñeta va en el desarrollo (dd), no en el título de la entrada (dt) */
+.b dd { position: relative; margin: 0; max-width: var(--measure); font-weight: 400; padding-left: 1.15em; text-indent: -1.15em; }
+.b dd::before { content: "– "; color: var(--dim); }
 .b .scroll { overflow-x: auto; margin: 0.4rem 0 1.3rem; max-width: 96ch; }
 .b table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
 .b th, .b td { border: 1px solid var(--line); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
@@ -295,6 +263,7 @@ a.designer:hover, a.designer:focus-visible {
 .b .anat { margin: 0.4rem 0 1.3rem; }
 .b .anat .code { font-size: clamp(0.95em, 3.2vw, 1.35em); letter-spacing: 0.04em; margin-bottom: 1rem; }
 .b .anat .code b { border-bottom: 2px solid var(--fg); padding-bottom: 2px; }
+.b .anat dl { column-width: auto; }
 .b .anat dl > div { display: grid; grid-template-columns: 9ch minmax(0, 1fr); gap: 1rem; }
 .b .anat dt { text-transform: none; letter-spacing: 0; }
 .b .colors { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.8rem; margin: 0.4rem 0 1.3rem; max-width: 96ch; }
@@ -302,7 +271,7 @@ a.designer:hover, a.designer:focus-visible {
 .b .colors i { flex: 0 0 auto; width: 1.4rem; height: 1.4rem; border: 1px solid var(--line); }
 .b .colors b { color: var(--dim); font-size: 0.9em; }
 /* enlaces del documento, al final de cada tema */
-.links { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); max-width: 96ch; }
+.links { margin-top: 3.6rem; padding-top: 0; max-width: 96ch; }
 .links h3 { margin: 0 0 0.8rem; }
 .links ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(28ch, 1fr)); gap: 0.15rem 1.6rem; }
 .links li { font-weight: 400; font-size: 0.88em; }
@@ -333,27 +302,40 @@ a.designer:hover, a.designer:focus-visible {
 .vid figcaption a { text-decoration: none; color: var(--dim); flex: 0 0 auto; }
 .vid figcaption a:hover { color: var(--fg); }
 
-.b dd .ex { display: block; margin-top: 0.8rem; max-width: 16rem; }
-.b dd .ex img { display: block; width: 100%; border: 1px solid var(--line); filter: grayscale(.15) contrast(1.02); transition: filter .5s ease-in-out, transform .5s ease-in-out; }
-.b dd .ex:hover img { filter: grayscale(0) contrast(1.05); transform: scale(1.015); }
-.b dd .ex figcaption { font-weight: 400; font-size: 0.78em; color: var(--dim); margin-top: 0.35rem; }
-.b dd .ex figcaption a { color: inherit; text-decoration: none; }
-.b dd .ex figcaption a:hover { color: var(--fg); }
+/* la imagen no reserva su propio lugar: queda suelta detrás del
+   texto (z-index negativo dentro de la misma entrada), así que el
+   desarrollo sigue corriendo derecho por encima y las palabras
+   quedan literalmente montadas sobre la foto, no al lado.          */
+.b dd .ex {
+  position: absolute; z-index: -1; right: 0; bottom: 0; margin: 0;
+  width: 9.5rem; pointer-events: none;
+}
+.b dd .ex img { display: block; width: 100%; border: 1px solid var(--line); filter: grayscale(.15) contrast(1.02); }
+.b dd .ex figcaption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  font-weight: 400; font-size: 0.72em; line-height: 1.35; color: #f2f0ea;
+  background: rgba(10,9,6,.6); padding: 0.25rem 0.35rem;
+}
+.b dd .ex figcaption a { color: inherit; text-decoration: none; pointer-events: auto; }
+.b dd .ex figcaption a:hover { text-decoration: underline; }
+/* halo detrás de las letras que caen sobre la foto, para que se
+   puedan seguir leyendo aunque estén encima de ella.               */
+.b dd:has(.ex) { text-shadow: 0 0 2px var(--bg), 0 0 4px var(--bg), 0 0 8px var(--bg); }
 
-.b .sources > div { padding: 1rem 0; border-top: 1px solid var(--line2); max-width: var(--measure); font-weight: 400; }
+.b .sources > div { padding: 0; margin: 1.5rem 0 0; max-width: var(--measure); font-weight: 400; }
+.b .sources > div:first-child { margin-top: 0; }
 .b .sources .sg { font-weight: 700; letter-spacing: 0.12em; display: block; margin-bottom: 0.25rem; }
 .b .sources .st { display: block; color: var(--dim); margin-top: 0.25rem; }
 
 @media (max-width: 640px) {
-  .pad { padding-left: 1.1rem; }
-  .i-inline .strip, .i-nums .strip { padding-left: 1.1rem; }
+  .pad, .idxbar { padding-left: 1.1rem; padding-right: 1.1rem; }
   .b .anat dl > div { grid-template-columns: 1fr; gap: 0.2rem; }
+  .b dd .ex { width: 40%; }
 }
 </style>
 </head>
 <body>
 
-<div class="progress" aria-hidden="true"><i></i></div>
 <div class="margin-glitch" aria-hidden="true"></div>
 
 <p class="settings">
@@ -1492,7 +1474,6 @@ const LINKS = {
 
 /* ---- estado ---- */
 let lang = "en", theme = "dark", view = "index";
-const idx = "nums", read = "cont";   // decidido: Números + Continua
 let cur = 0;
 
 
@@ -1506,9 +1487,9 @@ function blocks(list) {
     switch (b.k) {
       case "sub": return `<h3>${E(b.tx)}</h3>`;
       case "p": return `<p>${E(b.tx)}</p>`;
-      case "note": return `<p class="note">${E(b.tx)}${b.ref ? `<span class="ref">→ ${esc(b.ref)}</span>` : ""}</p>`;
+      case "note": return `<p class="note">${E(b.tx)}</p>`;
       case "fields": return `<dl>${b.rows.map(([k, v]) => `<div><dt>${E(k)}</dt><dd>${E(v)}</dd></div>`).join("")}</dl>`;
-      case "entries": return `<dl>${b.rows.map(([k, v, r, img]) => `<div><dt>${E(k)}</dt><dd>${E(v)}${r ? `<span class="ref">→ ${esc(r)}</span>` : ""}${img ? `<figure class="ex"><img src="${esc(img)}" alt="${E(k)}" loading="lazy"><figcaption><a href="https://www.instagram.com/poellinfo/" target="_blank" rel="noopener">@poellinfo ↗</a></figcaption></figure>` : ""}</dd></div>`).join("")}</dl>`;
+      case "entries": return `<dl>${b.rows.map(([k, v, r, img]) => `<div><dt>${E(k)}</dt><dd>${E(v)}${img ? `<figure class="ex"><img src="${esc(img)}" alt="${E(k)}" loading="lazy"><figcaption><a href="https://www.instagram.com/poellinfo/" target="_blank" rel="noopener">@poellinfo ↗</a></figcaption></figure>` : ""}</dd></div>`).join("")}</dl>`;
       case "timeline": return `<div class="scroll"><table class="tl"><tbody>${b.rows.map(([d, t, v]) =>
         `<tr><td>${esc(d)}</td><td>${E(t)}</td><td>${E(v)}</td></tr>`).join("")}</tbody></table></div>`;
       case "table": return `<div class="scroll"><table><thead><tr>${b.head.map(h => `<th>${E(h)}</th>`).join("")}</tr></thead><tbody>${
@@ -1597,37 +1578,35 @@ function cover() {
   </div>`;
 }
 
-/* ---- índice horizontal ---- */
+/* ---- índice lateral ----
+   Ancla real por sección (href="#s-…"), más la vuelta al menú de
+   diseñadores como primera entrada. Estático: nada de sticky-scroll
+   horizontal, ni relleno animado al pasar el mouse.                */
 function strip() {
-  const items = CCP.sections.map((s, i) => {
-    const on = read === "one" ? i === cur : i === cur;
-    const label = idx === "nums" ? "" : `<span>${E(s.t)}</span>`;
-    return `<button data-sec="${i}" aria-current="${on}"><span class="n">${esc(s.n)}</span>${label}</button>`;
-  }).join("");
-  const now = idx === "nums" ? `<span class="now">${E(CCP.sections[cur].t)}</span>` : "";
-  return `<nav class="idxbar i-${idx}"><div class="strip">${items}${now}</div></nav>`;
+  const items = CCP.sections.map((s, i) =>
+    `<li><a href="#s-${esc(s.id)}" data-sec="${i}" aria-current="${i === cur}"><span class="n">${esc(s.n)}</span>${E(s.t)}</a></li>`
+  ).join("");
+  return `<nav class="idxbar" aria-label="${E(UI.contents)}">
+    <a class="idx-home" href="#" data-open="index">← ${E(UI.designers)}</a>
+    <ul class="strip">${items}</ul>
+  </nav>`;
 }
 
 /* ---- ficha ---- */
 function file() {
-  const secs = read === "one" ? [CCP.sections[cur]] : CCP.sections;
-  const nav = false ? `<div class="nav">
-      <button data-sec="${cur - 1}" ${cur === 0 ? "disabled" : ""}>${cur > 0 ? "← " + E(CCP.sections[cur - 1].t) : ""}</button>
-      <button data-sec="${cur + 1}" ${cur === CCP.sections.length - 1 ? "disabled" : ""}>${cur < CCP.sections.length - 1 ? E(CCP.sections[cur + 1].t) + " →" : ""}</button>
-    </div>` : "";
-  return `<article class="file r-${read}">
+  return `<article class="file">
     <div class="pad">
-      <p class="back"><a href="#" data-open="index">← ${E(UI.designers)}</a></p>
       <header class="masthead">
         <h1>${esc(CCP.name)}</h1>
         <p class="dek">${E(CCP.sub)}</p>
       </header>
     </div>
-    ${strip()}
-    <div class="pad body">
-      ${secs.map(s => `<section class="sec" id="s-${s.id}">
-        <h2><span class="n">${esc(s.n)}</span>${E(s.t)}</h2>${blocks(s.blocks)}${linksOf(s.id)}</section>`).join("")}
-      ${nav}
+    <div class="layout">
+      ${strip()}
+      <div class="pad body">
+        ${CCP.sections.map(s => `<section class="sec" id="s-${s.id}">
+          <h2><span class="n">${esc(s.n)}</span>${E(s.t)}</h2>${blocks(s.blocks)}${linksOf(s.id)}</section>`).join("")}
+      </div>
     </div>
   </article>`;
 }
@@ -1654,7 +1633,6 @@ function paint(top) {
   window.scrollTo({ top: y, behavior: "instant" });
   spy();
   centerStrip();
-  progress();
   drawMarginGlitch();
   applyTextGlitch();
 }
@@ -1704,7 +1682,7 @@ const glitchPlan = {
 function drawMarginGlitch() {
   const wrap = document.querySelector(".margin-glitch");
   if (!wrap) return;
-  if (view !== "ccp" || getComputedStyle(wrap).display === "none") { wrap.innerHTML = ""; wrap.style.clipPath = ""; return; }
+  if (getComputedStyle(wrap).display === "none") { wrap.innerHTML = ""; wrap.style.clipPath = ""; return; }
   // ancho disponible según el viewport, pero la porción que realmente
   // se usa cambia con glitchPlan — a veces angosto, a veces casi todo.
   const maxAvail = Math.min(360, Math.max(0, (window.innerWidth - 1300) / 2 + 90));
@@ -1801,10 +1779,14 @@ function applyTextGlitch() {
     el.classList.remove("glitch-line");
     delete el.dataset.glitch;
   });
-  if (view !== "ccp" || window.innerWidth < 1500) return;
-  const candidates = [...document.querySelectorAll(".b p, .b dd")].filter(el =>
-    el.textContent.trim().length > 30 && !el.querySelector(".ex"));
-  const n = Math.min(candidates.length, 3 + Math.floor(Math.random() * 4));
+  if (window.innerWidth < 1500) return;
+  // en la ficha, un puñado de párrafos; en la portada, un solo
+  // nombre — la funcionalidad sigue viva, pero casi no se nota
+  // (la opacidad queda resuelta en CSS, por vista).
+  const candidates = view === "ccp"
+    ? [...document.querySelectorAll(".b p, .b dd")].filter(el => el.textContent.trim().length > 30 && !el.querySelector(".ex"))
+    : [...document.querySelectorAll(".designer")].filter(el => el.textContent.trim().length > 3);
+  const n = view === "ccp" ? Math.min(candidates.length, 8 + Math.floor(Math.random() * 7)) : Math.min(candidates.length, 1);
   for (let i = 0; i < n; i++) {
     const el = candidates.splice(Math.floor(Math.random() * candidates.length), 1)[0];
     if (!el) continue;
@@ -1814,23 +1796,12 @@ function applyTextGlitch() {
 }
 
 
-/* barra de progreso de lectura, sólo en la ficha */
-function progress() {
-  const bar = document.querySelector(".progress i");
-  if (!bar) return;
-  if (view !== "ccp") { bar.style.width = "0%"; return; }
-  const max = document.documentElement.scrollHeight - window.innerHeight;
-  bar.style.width = (max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0) + "%";
-}
-
 /* en lectura continua, marcar la sección que se está leyendo */
 function spy() {
-  if (view !== "ccp" || read !== "cont") return;
+  if (view !== "ccp") return;
   const secs = [...document.querySelectorAll(".sec")];
   if (!secs.length) return;
-  const line = window.scrollY + parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bar"))
-             + parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--set"))
-             + parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--idx")) + 24;
+  const line = window.scrollY + parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--set")) + 24;
   let i = 0;
   secs.forEach((s, k) => { if (s.offsetTop <= line) i = k; });
   if (i !== cur) { cur = i; markStrip(); centerStrip(); }
@@ -1838,18 +1809,17 @@ function spy() {
 function markStrip() {
   document.querySelectorAll(".idxbar [data-sec]").forEach((b, i) =>
     b.setAttribute("aria-current", String(i === cur)));
-  const now = document.querySelector(".idxbar .now");
-  if (now) now.textContent = L(CCP.sections[cur].t);
 }
-/* que el ítem activo quede siempre visible en la tira */
+/* que el ítem activo quede siempre visible dentro del índice lateral,
+   cuando éste tiene su propio scroll (columna izquierda, fija) */
 function centerStrip() {
-  const st = document.querySelector(".idxbar .strip");
+  const st = document.querySelector(".idxbar");
   if (!st) return;
   const b = st.querySelector('[data-sec][aria-current="true"]');
   if (!b) return;
-  const l = b.offsetLeft, r = l + b.offsetWidth;
-  if (l < st.scrollLeft || r > st.scrollLeft + st.clientWidth)
-    st.scrollTo({ left: l - st.clientWidth / 2 + b.offsetWidth / 2, behavior: "instant" });
+  const t = b.offsetTop, bo = t + b.offsetHeight;
+  if (t < st.scrollTop || bo > st.scrollTop + st.clientHeight)
+    st.scrollTo({ top: t - st.clientHeight / 2 + b.offsetHeight / 2, behavior: "instant" });
 }
 
 function go(v, push) {
@@ -1864,14 +1834,12 @@ document.addEventListener("click", e => {
   const th = e.target.closest(".settings [data-theme]");
   if (th) { theme = th.dataset.theme; paint(false); return; }
   const sc = e.target.closest("[data-sec]");
-  if (sc && !sc.disabled) {
+  if (sc) {
+    e.preventDefault();
     const i = Math.max(0, Math.min(CCP.sections.length - 1, +sc.dataset.sec));
-    if (read === "one") { cur = i; paint(true); }
-    else {
-      cur = i; markStrip(); centerStrip();
-      const el = document.getElementById("s-" + CCP.sections[i].id);
-      if (el) el.scrollIntoView({ block: "start" });
-    }
+    cur = i; markStrip(); centerStrip();
+    const el = document.getElementById("s-" + CCP.sections[i].id);
+    if (el) el.scrollIntoView({ block: "start" });
     return;
   }
   const pl = e.target.closest(".vid .play");
@@ -1897,10 +1865,8 @@ const onScroll = () => {
   if (window.scrollY > 8) document.body.setAttribute("data-scrolled", "");
   else document.body.removeAttribute("data-scrolled");
   spy();
-  progress();
 };
 window.addEventListener("scroll", onScroll, { passive: true });
-window.addEventListener("resize", progress, { passive: true });
 
 view = location.hash.replace("#", "") === "ccp" ? "ccp" : "index";
 paint(true);
