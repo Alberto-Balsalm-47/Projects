@@ -188,7 +188,6 @@ a.designer:hover, a.designer:focus-visible { color: var(--fg); }
   display: block; color: var(--lnk); text-decoration: underline; text-underline-offset: 2px; padding: 0.3rem 0;
   font-size: 0.92em; line-height: 1.4;
 }
-.idxbar .strip a .n { font-weight: 400; margin-right: 1ch; }
 .idxbar .strip a:hover { color: var(--fg); }
 .idxbar .strip a[aria-current="true"] { font-weight: 700; }
 
@@ -220,7 +219,7 @@ a.designer:hover, a.designer:focus-visible { color: var(--fg); }
   font-size: 1.5em; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; margin: 0 0 2rem;
   max-width: 96ch;
 }
-.sec > h2 .n { font-weight: 400; color: var(--dim); margin-right: 1.2ch; }
+.sec > h2 .n { color: var(--dim); }
 .sec { padding-bottom: 4.5rem; scroll-margin-top: calc(var(--set) + 1rem); }
 
 /* distorsión sobre el texto explicativo, acompañando la estática
@@ -239,10 +238,20 @@ body[data-view="index"] .glitch-line::before, body[data-view="index"] .glitch-li
    entrada lleva una viñeta sutil en vez del filete que separaba
    antes; el espacio entre entradas hace el trabajo que hacía la
    línea.                                                          */
-.b h3 { font-size: 1.1em; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--fg); margin: 2.8rem 0 1.1rem; }
-.b p:not(.note) { margin: 0 0 1rem; max-width: var(--measure); padding-left: 1.15em; text-indent: -1.15em; }
-.b p:not(.note)::before { content: "– "; color: var(--dim); }
-.b .note { font-weight: 400; color: var(--dim); max-width: var(--measure); padding-left: 1rem; margin: 1.6rem 0 0; }
+.b h3 { font-size: 1.3em; font-weight: 700; letter-spacing: 0.01em; color: var(--fg); margin: 2.8rem 0 1.1rem; }
+/* énfasis dentro del párrafo: el cuerpo ya es todo negrita (Courier
+   Bold), así que **fuerte** no puede apoyarse en el peso — usa
+   subrayado, como el subrayado de una máquina de escribir. `código`
+   lleva un fondo tenue; _cursiva_ ya se distingue sola en el tipo. */
+.b b { font-weight: 700; text-decoration: underline; text-decoration-color: var(--dim); text-underline-offset: 3px; }
+.b code { background: var(--line2); padding: 0.05em 0.35em; font-size: 0.92em; }
+/* viñeta real, como la lista de christoph-knoth.com: <ul><li> con el
+   marcador nativo del navegador, no un ::before simulado — así el
+   sangrado y el punto quedan resueltos por el propio user-agent,
+   sin depender de text-indent (que se perdía dentro de las
+   columnas de la instrucción 3, más abajo).                        */
+.b ul.bp { list-style-type: "- "; margin: 0 0 1rem; padding-left: 1.3em; max-width: var(--measure); }
+.b ul.bp li::marker { color: var(--dim); }
 /* la columna es real: en pantalla ancha, las entradas de cada tema
    se acomodan en dos columnas de diario, no en una sola tira larga. */
 .b dl { margin: 0; max-width: 96ch; column-width: 22rem; column-gap: 2.2rem; }
@@ -253,8 +262,8 @@ body[data-view="index"] .glitch-line::before, body[data-view="index"] .glitch-li
 .b dd { position: relative; margin: 0; max-width: var(--measure); font-weight: 400; padding-left: 1.15em; text-indent: -1.15em; }
 .b dd::before { content: "– "; color: var(--dim); }
 .b .scroll { overflow-x: auto; margin: 0.4rem 0 1.3rem; max-width: 96ch; }
-.b table { border-collapse: collapse; width: 100%; font-size: 0.92em; }
-.b th, .b td { border: 1px solid var(--line); padding: 0.45rem 0.6rem; text-align: left; vertical-align: top; }
+.b table { border-collapse: collapse; width: 100%; font-size: 0.72em; }
+.b th, .b td { border: 1px solid var(--line); padding: 0.28rem 0.4rem; text-align: left; vertical-align: top; line-height: 1.35; }
 .b th { font-weight: 400; font-size: 0.82em; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
 .b td { font-weight: 400; }
 .b td:first-child { font-weight: 700; }
@@ -322,15 +331,48 @@ body[data-view="index"] .glitch-line::before, body[data-view="index"] .glitch-li
    puedan seguir leyendo aunque estén encima de ella.               */
 .b dd:has(.ex) { text-shadow: 0 0 2px var(--bg), 0 0 4px var(--bg), 0 0 8px var(--bg); }
 
+/* figuras sueltas del documento: por defecto, tratamiento llano —
+   imagen y leyenda debajo, en el flujo normal, como una foto de
+   diario cualquiera.                                              */
+.b .fig { margin: 1.8rem 0; max-width: 11.5rem; }
+/* Mainstream-Downstream es un díptico (dos tomas una junto a la
+   otra): al tope de 11.5rem se vuelve ilegible, así que sube sola. */
+.b .fig:has(img[src*="31-mainstream-downstream"]) { max-width: 20rem; }
+.b .fig img { display: block; width: 100%; border: 1px solid var(--line); filter: grayscale(.15) contrast(1.02); }
+.b .fig figcaption { font-weight: 400; font-size: 0.82em; color: var(--dim); margin-top: 0.4rem; line-height: 1.4; }
+/* contrapuestas (nueve, ver TIGHT en el script): flota para quedar
+   pegada al margen derecho, con un margen inferior muy negativo que
+   encoge la zona que el texto esquiva. position:relative + z-index
+   negativo saca cualquier ambigüedad de encima: la figura queda
+   forzada al fondo, detrás del párrafo entero, así que el texto es
+   lo que se superpone a la imagen y no al revés.                   */
+.b .fig.tight { float: right; position: relative; z-index: -1; width: 11.5rem; max-width: 11.5rem; margin: 0.2rem 0 -11rem 1.3rem; }
+.b .fig.tight figcaption { font-size: 0.76em; }
+
+/* del lado derecho, sin superponerse (cuatro, ver RIGHT): flota
+   igual, pero con margen normal — el texto la esquiva, no la pisa. */
+.b .fig.right { float: right; width: 11.5rem; max-width: 11.5rem; margin: 0.2rem 0 1.2rem 1.3rem; }
+
+/* instrucción 3 (columna): cinco subtemas puntuales — marcados por
+   h3.grp-start y agrupados en JS — se parten en dos columnas de
+   diario en vez de la tira corrida de siempre. La figura de ese
+   mismo subtema (float:right, más arriba) queda flotando adentro,
+   así que el párrafo en columna es lo que le pisa el borde.        */
+.b .grp { column-width: 22rem; column-gap: 2rem; margin-top: 1rem; }
+.b .grp > ul.bp, .b .grp > .fig { break-inside: avoid; }
+
 .b .sources > div { padding: 0; margin: 1.5rem 0 0; max-width: var(--measure); font-weight: 400; }
 .b .sources > div:first-child { margin-top: 0; }
 .b .sources .sg { font-weight: 700; letter-spacing: 0.12em; display: block; margin-bottom: 0.25rem; }
+.b .sources .sg a { color: var(--lnk); text-decoration: underline; text-underline-offset: 2px; }
+.b .sources .sg a:hover { color: var(--fg); }
 .b .sources .st { display: block; color: var(--dim); margin-top: 0.25rem; }
 
 @media (max-width: 640px) {
   .pad, .idxbar { padding-left: 1.1rem; padding-right: 1.1rem; }
   .b .anat dl > div { grid-template-columns: 1fr; gap: 0.2rem; }
   .b dd .ex { width: 40%; }
+  .b .fig.tight, .b .fig.right { float: none; width: 60%; margin: 1rem auto; }
 }
 </style>
 </head>
@@ -387,295 +429,1695 @@ const DESIGNERS = [
 ];
 
 const CCP = {
-  name: "Carol Christian Poell",
-  sub: ["Perfil, método, técnica y obra", "Profile, method, technique and work"],
-  epigraph: [
-    "«Vanguardia es pensamiento avanzado e individual. La traducción exacta del francés es “delante de la multitud”; por tanto no puede ser nunca tendencia ni estar de moda.»",
-    "“Avant-garde is advanced, individual thought. The exact translation from the French is ‘ahead of the crowd’; it can therefore never be a trend or in fashion.”"
-  ],
-  sections: [
+ "name": "Carol Christian Poell",
+ "sub": [
+  "Desglose del diseñador a partir del archivo",
+  "A breakdown of the designer from the archive"
+ ],
+ "epigraph": [
+  "«Vanguardia es pensamiento avanzado e individual. La traducción exacta del francés es “delante de la multitud”; por tanto no puede ser nunca tendencia ni estar de moda.»",
+  "“Avant-garde is advanced, individual thought. The exact translation from the French is ‘ahead of the crowd’; it can therefore never be a trend or in fashion.”"
+ ],
+ "note": [
+  "Cada tema termina con un apartado de **links** que remite al archivo donde está desarrollado, con la página o la entrada exactas. El documento da lo mínimo indispensable: la profundidad está en las fuentes.",
+  "Each theme ends with a **links** section pointing to the file where it is developed, with the exact page or entry. The document gives the bare minimum: the depth is in the sources."
+ ],
+ "sections": [
+  {
+   "id": "situacion",
+   "n": "01",
+   "t": [
+    "Situación",
+    "Situation"
+   ],
+   "blocks": [
+    {
+     "k": "sub",
+     "tx": [
+      "Origen y formación",
+      "Background and training"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Linz, 1966, familia de curtidores y un matadero a pocos metros. De ahí la posición que sostiene toda su obra: el animal del que sale el material no es un dato indiferente, y ocultarlo sería la única operación deshonesta.",
+      "Linz, 1966, a family of tanners and a slaughterhouse a few metres away. Hence the position underpinning his whole work: the animal the material comes from is not a matter of indifference, and concealing it would be the only dishonest operation."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Elige sastre frente a curtidor por ser el oficio menos familiar, decisión de método y no de gusto. Tras formarse en Graz y Michelbeuern, pasa a la Domus Academy de Milán, donde busca el lado conceptual: cómo se planifica una colección.",
+      "He chose tailor over tanner as the less familiar trade, a decision of method rather than taste. After training in Graz and Michelbeuern he moved to the Domus Academy in Milan, seeking the conceptual side: how a collection is planned."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "La firma",
+      "The signature"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El acrónimo C.C.P. evita fetichizar al diseñador, y la retirada es literal: durante años la única imagen disponible fue una fotografía robada. No se define como diseñador ni artista, sino como _ricercatore_.",
+      "The C.C.P. acronym avoids fetishising the designer, and the withdrawal is literal: for years the only available image was a stolen photograph. He defines himself neither as designer nor artist but as a _ricercatore_."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Milán y el sistema",
+      "Milan and the system"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Poell trabaja en Milán, capital del pret-a-porter industrial, mientras la vanguardia de los noventa se concentra en Amberes, París y Tokio: _Fashion Now 2_ lo llama una anomalía. Lehmann explica por qué incomoda: el sistema no puede permitir que un producto se optimice hasta su forma definitiva, porque la aceptación general del pantalón definitivo acabaría con el negocio.",
+      "Poell works in Milan, capital of industrial ready-to-wear, while the nineties avant-garde concentrated in Antwerp, Paris and Tokyo: _Fashion Now 2_ calls him an anomaly. Lehmann explains why this is uncomfortable: the system cannot allow a product to be optimised into its definitive form, because general acceptance of the ultimate trouser would end the business."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Sitio web oficial",
+      "Official website"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "https://www.carolchristianpoell.com/",
+      "https://www.carolchristianpoell.com/"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cronologia",
+   "n": "02",
+   "t": [
+    "Cronología",
+    "Chronology"
+   ],
+   "blocks": [
+    {
+     "k": "p",
+     "tx": [
+      "Tres tramos. **1994-1999**: entra por la puerta técnica y desarrolla sus propios materiales. **2000-2004**: convierte la presentación en argumento —cámara frigorífica, matadero, perrera— y cierra el ciclo con _Mainstream-Downstream_, obra y dimisión a la vez. **2005-2010**: el discurso se traslada al objeto, hasta que da el diseño por concluido.",
+      "Three stretches. **1994-1999**: he enters through the technical door and develops his own materials. **2000-2004**: he turns the presentation into an argument — cold room, slaughterhouse, dog pound — closing the cycle with _Mainstream-Downstream_, at once work and resignation. **2005-2010**: the discourse moves into the object, until he declares the design finished."
+     ]
+    },
+    {
+     "k": "table",
+     "cap": [
+      "Cuadro 1. Cronología",
+      "Table 1. Chronology"
+     ],
+     "head": [
+      [
+       "Fecha",
+       "Date"
+      ],
+      [
+       "Hito",
+       "Milestone"
+      ],
+      [
+       "Aportación",
+       "Contribution"
+      ]
+     ],
+     "rows": [
+      [
+       "FW 94-95",
+       [
+        "Unintended Collection",
+        "Unintended Collection"
+       ],
+       [
+        "Unos compradores japoneses la agotan por casualidad.",
+        "Japanese buyers sell it out by accident."
+       ]
+      ],
+      [
+       "1995-96",
+       [
+        "1st Intended Collection",
+        "1st Intended Collection"
+       ],
+       [
+        "Desde aquí desarrolla él mismo sus tejidos.",
+        "From here on he develops his own fabrics."
+       ]
+      ],
+      [
+       "SS 97",
+       [
+        "—",
+        "—"
+       ],
+       [
+        "Delantal integral en sintético.",
+        "A full-body apron in synthetic fabric."
+       ]
+      ],
+      [
+       "SS 98",
+       [
+        "Improper (MALE)",
+        "Improper (MALE)"
+       ],
+       [
+        "Aberturas sobre zonas sexualizadas del cuerpo.",
+        "Openings over sexualised zones of the body."
+       ]
+      ],
+      [
+       "FW 98-99",
+       [
+        "—",
+        "—"
+       ],
+       [
+        "Chaqueta proto-esgrima de cuero veteado: el bulo.",
+        "Proto-fencing jacket in veined leather: the hoax."
+       ]
+      ],
+      [
+       "1998-99",
+       [
+        "Primera FE-MALE",
+        "First FE-MALE"
+       ],
+       [
+        "Por fases: bajos, chaquetas, cuerpo entero.",
+        "In phases: bottoms, jackets, whole body."
+       ]
+      ],
+      [
+       "AW 99-00",
+       [
+        "—",
+        "—"
+       ],
+       [
+        "Amarillo intenso; hombro alto y estrecho.",
+        "Bright yellow; high narrow shoulder."
+       ]
+      ],
+      [
+       "SS 00",
+       [
+        "Trilogy of Monotypologies 2",
+        "Trilogy of Monotypologies 2"
+       ],
+       [
+        "Falda de cuero transparente teñido en sangre.",
+        "Skirt in blood-dyed transparent leather."
+       ]
+      ],
+      [
+       "28.06.2000",
+       [
+        "Three Refrigerated Cells",
+        "Three Refrigerated Cells"
+       ],
+       [
+        "Matadero: colección · animales desollados · espejo.",
+        "Slaughterhouse: collection · flayed animals · mirror."
+       ]
+      ],
+      [
+       "14-16.10.2000",
+       [
+        "Best Before 16/10/00",
+        "Best Before 16/10/00"
+       ],
+       [
+        "Presentación del cuero transparente.",
+        "Presentation of transparent leather."
+       ]
+      ],
+      [
+       "AW 00-01",
+       [
+        "Pure / Impure",
+        "Pure / Impure"
+       ],
+       [
+        "Puño de bronce; derbies sin suela; Bandage Pants.",
+        "Bronze duster; soleless derbies; Bandage Pants."
+       ]
+      ],
+      [
+       "FW 00-01",
+       [
+        "Trilogy of Monotypologies III",
+        "Trilogy of Monotypologies III"
+       ],
+       [
+        "Abrigo sin mangas de cabello humano.",
+        "Sleeveless coat made of human hair."
+       ]
+      ],
+      [
+       "SS 01",
+       [
+        "A Masculine Femininity",
+        "A Masculine Femininity"
+       ],
+       [
+        "La «pata de animal de la suerte»: no el pie de conejo, la pata entera.",
+        "The \"lucky animal leg\": not the rabbit's foot, the whole leg."
+       ]
+      ],
+      [
+       "17.01.2001",
+       [
+        "Public Freedom",
+        "Public Freedom"
+       ],
+       [
+        "Perrera. Colgante de dientes; pantalón sin entrepierna.",
+        "Dog pound. Teeth pendant; crotchless trousers."
+       ]
+      ],
+      [
+       "AW 01-02",
+       [
+        "A Peculiar Femininity",
+        "A Peculiar Femininity"
+       ],
+       [
+        "Boa de intestino, gorguera, sujetador de metal.",
+        "Intestine boa, ruff, metal bra."
+       ]
+      ],
+      [
+       "SS 02",
+       [
+        "Traditional Escape",
+        "Traditional Escape"
+       ],
+       [
+        "Descenso vendado. Corte láser.",
+        "Blindfolded descent. Laser cutting."
+       ]
+      ],
+      [
+       "FW 02-03",
+       [
+        "Attraction",
+        "Attraction"
+       ],
+       [
+        "Pantalón retorcido, flocado sobre cuero.",
+        "Twisted trouser, flocking on leather."
+       ]
+      ],
+      [
+       "SS 04",
+       [
+        "Mainstream-Downstream",
+        "Mainstream-Downstream"
+       ],
+       [
+        "17 cuerpos por el Naviglio. Última presentación.",
+        "17 bodies down the Naviglio. Last presentation."
+       ]
+      ],
+      [
+       "AW 04-05",
+       [
+        "Instant Collection",
+        "Instant Collection"
+       ],
+       [
+        "Lookbook en armario forense; colores 15 y 16.",
+        "Lookbook in a forensic cabinet; colours 15, 16."
+       ]
+      ],
+      [
+       "SS 05",
+       [
+        "Dispossessed",
+        "Dispossessed"
+       ],
+       [
+        "El overlock enmarcando el lookbook.",
+        "The overlock framing the lookbook."
+       ]
+      ],
+      [
+       "2005",
+       [
+        "Colección de mujer",
+        "Women's collection"
+       ],
+       [
+        "Curtido en sangre.",
+        "Blood tanning."
+       ]
+      ],
+      [
+       "SS 06",
+       [
+        "U-Turn",
+        "U-Turn"
+       ],
+       [
+        "Corbata de cabello, anillo de ojo, traje Corpulence.",
+        "Hair tie, eye ring, Corpulence suit."
+       ]
+      ],
+      [
+       "FW 06-07",
+       [
+        "B-Sides",
+        "B-Sides"
+       ],
+       [
+        "Debutan las prendas BOX.",
+        "The BOX garments debut."
+       ]
+      ],
+      [
+       "SS 07",
+       [
+        "Paranoid",
+        "Paranoid"
+       ],
+       [
+        "El collar de 2 kg.",
+        "The 2 kg necklace."
+       ]
+      ],
+      [
+       "FW 07-08",
+       [
+        "Disjointed",
+        "Disjointed"
+       ],
+       [
+        "Object tanning y tempering. Técnicamente decisiva.",
+        "Object tanning and tempering. Technically decisive."
+       ]
+      ],
+      [
+       "SS 08",
+       [
+        "Off-Scene",
+        "Off-Scene"
+       ],
+       [
+        "Cuero perforado, KITE-S, costuras encoladas.",
+        "Perforated leather, KITE-S, glued seams."
+       ]
+      ],
+      [
+       "2009",
+       [
+        "Selfsame",
+        "Selfsame"
+       ],
+       [
+        "Nacen SELF-EDGE y el drip. Fibra de vidrio.",
+        "SELF-EDGE and drip born. Fibreglass."
+       ]
+      ],
+      [
+       "2010",
+       [
+        "Dead End",
+        "Dead End"
+       ],
+       [
+        "Una pieza con doble cicatriz; bisonte. Fin.",
+        "One piece, double scar; bison. The end."
+       ]
+      ],
+      [
+       "14.04.2010",
+       [
+        "Squartter",
+        "Squartter"
+       ],
+       [
+        "El caballo curtido en objeto.",
+        "The object-tanned horse."
+       ]
+      ],
+      [
+       "2012",
+       [
+        "Inedito / Unseen",
+        "Inedito / Unseen"
+       ],
+       [
+        "El caballo en espacio comercial.",
+        "The horse in a commercial space."
+       ]
+      ],
+      [
+       "2024",
+       [
+        "In-Between",
+        "In-Between"
+       ],
+       [
+        "Cápsula final: delantal de bisonte, Buckle Boots.",
+        "Final capsule: bison apron, Buckle Boots."
+       ]
+      ]
+     ]
+    }
+   ]
+  },
+  {
+   "id": "poetica",
+   "n": "03",
+   "t": [
+    "Poética",
+    "Poetics"
+   ],
+   "blocks": [
+    {
+     "k": "p",
+     "tx": [
+      "Tres principios de método y cuatro temas. Los principios explican cómo se decide; los temas, qué queda dicho.",
+      "Three principles of method and four themes. The principles explain how decisions are made; the themes, what ends up said."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Negación y Entziehung",
+      "Negation and Entziehung"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El método elimina las soluciones posibles hasta que la restante es forzosamente la correcta, por absurda que parezca. Lehmann lo emparenta con la navaja de Ockham; Michel demuestra que las costuras agotan las combinaciones lógicas de dos pares de opuestos.",
+      "The method eliminates the possible solutions until the remaining one is necessarily correct, however absurd. Lehmann relates it to Ockham’s razor; Michel shows that the seams exhaust the logical combinations of two pairs of opposites."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "_Entziehung_ procede de Bernhard: retirada cuando la genera el sujeto, privación cuando se le impone, y a un fonema de _Erziehung_, educación. Es a la vez método material y posición: el aislamiento como concepto estético.",
+      "_Entziehung_ comes from Bernhard: withdrawal when the subject generates it, deprivation when imposed, one phoneme from _Erziehung_, education. It is at once a material method and a position: isolation as an aesthetic concept."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Fuera del mercado",
+      "Outside the market"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Poell produce cuestionando el sistema capitalista; Lehmann precisa que no opera fuera de él, lo atraviesa de otro modo. Sin publicidad, celebridades, préstamos, calendario ni internet, sobre una red de menos de cincuenta tiendas.",
+      "Poell produces by questioning the capitalist system; Lehmann qualifies that he does not operate outside it, he traverses it differently. No advertising, celebrities, loans, calendar or internet, over a network of fewer than fifty stores."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Duda, referencialidad, adaptividad, continuidad",
+      "Doubt, referentiality, adaptivity, continuity"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El cuestionario de _Fashion Now 2_ condensa su posición: no reconoce diseños característicos, describe su trabajo como indeciso y resume su filosofía en una palabra, dudar. El archivo nombra tres principios: **referencialidad**, parafernalia médica y militar; **adaptividad**, cada añadido responde a una vulnerabilidad real; **continuidad**, cada elemento variable da a la prenda una cualidad propia.",
+      "The _Fashion Now 2_ questionnaire condenses his position: he acknowledges no signature designs, describes his work as undecided and sums up his philosophy in one word, to doubt. The archive names three principles: **referentiality**, medical and military paraphernalia; **adaptivity**, every addition answers a real vulnerability; **continuity**, each variable element gives the garment a quality of its own."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Vida y muerte · soberanía animal",
+      "Life and death · animal sovereignty"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/18-three-refrigerated-cells-2000-la-terce.jpg",
+     "cap": [
+      "_Three Refrigerated Cells_, 2000: la tercera cámara, con una silla y un espejo.",
+      "_Three Refrigerated Cells_, 2000: the third cell, a chair and a mirror."
+     ],
+     "ref": "POELLINFO c. 18"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Es el tema matriz. La costura define la prenda como superficie frágil, al borde de rasgarse; tejer se opone a curtir, que es eternizar una piel muerta. Michel advierte contra la lectura macabra: hay una tensión heraclítea en la que lo mortífero engendra lo vital.",
+      "This is the matrix theme. The seam defines the garment as a fragile surface on the verge of tearing; weaving opposes tanning, which is eternalising a dead skin. Michel warns against the macabre reading: there is a Heraclitean tension in which the deathly engenders the vital."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "CCP emplea subproductos de animales consumidos como alimento —caballo, canguro, bisonte, cerdo, ciervo, burro— y no pieles exóticas. _Three Refrigerated Cells_ sitúa los artículos junto a los cadáveres desollados y empuja al espectador, mediante un espejo, hacia la autorreflexión.",
+      "CCP uses by-products of animals consumed as food — horse, kangaroo, bison, pig, deer, donkey — and not exotic hides. _Three Refrigerated Cells_ places the articles beside the flayed carcasses and pushes the viewer, through a mirror, towards self-reflection."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Herida, exoesqueleto, valor ganado",
+      "Wound, exoskeleton, earned value"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La **herida** equilibra ausencia y presencia: cuero perforado y aberturas frente a las adiciones protésicas. El **exoesqueleto** se hace explícito en _Disjointed_, que funde lo artrópodo y lo medieval. El **valor ganado**: la comodidad se gana con compromiso físico, y el comprador queda como custodio.",
+      "The **wound** balances absence and presence: perforated leather and openings against prosthetic additions. The **exoskeleton** becomes explicit in _Disjointed_, fusing the arthropodal and the medieval. **Earned value**: comfort is earned through physical commitment, and the buyer is left a steward."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Paradoja, literalidad y abyección",
+      "Paradox, literalism and abjection"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/9-collar-de-dientes-mm1480-protesis-dent.jpg",
+     "cap": [
+      "Collar de dientes `MM1480`: prótesis dental expuesta como joya.",
+      "Teeth necklace `MM1480`: a dental prosthesis shown as jewellery."
+     ],
+     "ref": "POELLINFO c. 9"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La obra asocia características opuestas —piel y armadura, fascinación y repulsión— en la misma prenda: la estética no es contradictoria sino paradójica, y la incomodidad no es consecuencia de la investigación sino su base. El segundo movimiento es la desmetaforización: la prenda no es como una segunda piel, es piel; la costura es cicatriz e incisión.",
+      "The work pairs opposite characteristics — skin and armour, fascination and repulsion — in the same garment: the aesthetic is not contradictory but paradoxical, and discomfort is not a consequence of the research but its basis. The second movement is de-metaphorisation: the garment is not like a second skin, it is skin; the seam is scar and incision."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "genealogia",
+   "n": "04",
+   "t": [
+    "Genealogía",
+    "Genealogy"
+   ],
+   "blocks": [
+    {
+     "k": "sub",
+     "tx": [
+      "Accionismo vienés",
+      "Viennese Actionism"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Es la referencia artística mayor y el propio Poell la confirma. Michel documenta cuatro modos. **Cita directa**: el círculo de látex rojo de 2009 remite al círculo salpicado de sangre del _Orgien Mysterien Theater_ de Nitsch, 1974. **Homenaje**: la navaja de afeitar accionista, como colgante. **Reescritura**: en la performance fundacional de 1962 Muehl, Nitsch y Frohner se emparedaron pidiendo que los liberasen; _Traditional Escape_ los muestra escapando por la ventana. **Formas compartidas**: la cicatriz de Brus, 1965.",
+      "This is the major artistic reference and Poell confirms it himself. Michel documents four modes. **Direct citation**: the red latex circle of 2009 recalls the blood-spattered circle of Nitsch’s _Orgien Mysterien Theater_, 1974. **Homage**: the Actionist razor, as a pendant. **Rewriting**: in the founding 1962 performance Muehl, Nitsch and Frohner walled themselves in asking to be freed; _Traditional Escape_ shows them escaping through the window. **Shared forms**: the Brus scar, 1965."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El límite es igual de claro: los accionistas ponen en primer plano el terror y el asco; Poell incorpora además la fascinación, y por eso su obra resulta psicológicamente más compleja.",
+      "The limit is equally clear: the Actionists foreground terror and disgust; Poell adds fascination, which makes his work psychologically more complex."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Memoria histórica",
+      "Historical memory"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El punto de partida es una declaración de 2008: Poell afirma que le gustaría trabajar con piel humana igual que con la animal. Michel señala el doble tabú y rastrea otras huellas —el cabello humano, el talle próximo al uniforme, la chaqueta overlock cercana a la del as Erich Hartmann, el bisonte de 2010—. La conclusión es elegíaca: la creación después de Auschwitz.",
+      "The starting point is a 2008 statement: Poell says he would like to work with human skin as with animal skin. Michel notes the double taboo and traces other traces — human hair, the waist close to a uniform, the overlock jacket close to that of the ace Erich Hartmann, the 2010 bison. The conclusion is elegiac: creation after Auschwitz."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Literatura, arte y teoría",
+      "Literature, art and theory"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**Kafka** es modelo de indecisión genérica e imagen de la prenda protésica. **Bernhard** aporta el _Entziehung_. **Arte Povera** es el precedente material: realidad biológica contra la superficialidad de la alta moda. **Baudrillard**: el lujo higieniza los materiales y Poell invierte esa esterilización. **Marx**: el material precede a la forma. **Hegel** aporta el _Aufheben_: las últimas costuras superan a las anteriores. **Bataille**, leído por Kitchell, aporta la dramatización.",
+      "**Kafka** is a model of generic indecision and an image of the prosthetic garment. **Bernhard** supplies _Entziehung_. **Arte Povera** is the material precedent: biological reality against the superficiality of high fashion. **Baudrillard**: luxury sanitises materials and Poell reverses that sterilisation. **Marx**: material precedes form. **Hegel** supplies the _Aufheben_: the last seams surpass the earlier ones. **Bataille**, read by Kitchell, supplies dramatisation."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Referencialidad: militaria y medicina",
+      "Referentiality: militaria and medicine"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/19-multi-dimensional-bag-el-marco-de-prec.jpg",
+     "cap": [
+      "Multi-dimensional Bag: el marco de precintado soviético de 1961.",
+      "Multi-dimensional Bag: the Soviet sealing frame of 1961."
+     ],
+     "ref": "POELLINFO c. 19"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La Multi-dimensional Bag reproduce el marco de precintado de las bolsas soviéticas de transporte de dinero de hacia 1961, en cuero de caballo sumergido en caucho. El vest bag `AM/2573` parte de un chaleco salvavidas estadounidense de 1967, y los imperdibles de plata son imperdibles de lavandería de la Segunda Guerra Mundial.",
+      "The Multi-dimensional Bag reproduces the sealing frame of the Soviet money-transport bags of around 1961, in rubber-dipped horse leather. The `AM/2573` vest bag starts from a 1967 US life vest, and the silver safety pins are Second World War laundry pins."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "proceso",
+   "n": "05",
+   "t": [
+    "Proceso",
+    "Process"
+   ],
+   "blocks": [
+    {
+     "k": "sub",
+     "tx": [
+      "El taller y la materia primera",
+      "The workshop and primary material"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Segunda planta de una nave del sur de Milán ocupada durante diecisiete años; antes fue el taller de escenografía de la Ópera. La diferencia con un atelier de alta costura es de fondo: aquél sabe montar una prenda pero compra sus materiales; el equipo de C.C.P. los produce.",
+      "Second floor of a building in southern Milan occupied for seventeen years; before that the Opera’s scenery workshop. The difference from a couture atelier is fundamental: the latter knows how to assemble a garment but buys its materials; the C.C.P. team produces them."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Bonotto SpA, fábrica familiar de Molvena, teje buena parte de los tejidos. El acabado —no el tejido— aporta entre el sesenta y el setenta por ciento del carácter final del material, y la fábrica mantiene telares antiguos porque los automáticos no permiten intervenir.",
+      "Bonotto SpA, a family mill in Molvena, weaves much of the cloth. Finishing — not weaving — supplies between sixty and seventy per cent of the material’s final character, and the mill keeps old looms because automatic ones allow no intervention."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Los procesos invertidos",
+      "The inverted processes"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/10-bota-protesica-el-titanio-revelado-al.jpg",
+     "cap": [
+      "Bota protésica: el titanio revelado al lijar la superficie.",
+      "Prosthetic boot: titanium revealed by sanding the surface."
+     ],
+     "ref": "POELLINFO c. 10"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La firma técnica invierte el orden industrial: la industria trata el material y luego construye; CCP construye primero y trata después. En el **_object dyeing_** la prenda entera se tiñe en bombo una vez terminada, con tono y encogimiento imprevisibles. En el **_object tanning_**, que debuta en _Disjointed_, la prenda se cose en crudo y se curte entera al final, con un exceso de patrón del diez o quince por ciento.",
+      "The technical signature inverts the industrial order: industry treats the material and then builds; CCP builds first and treats afterwards. In **object dyeing** the whole garment is drum-dyed once finished, with unpredictable tone and shrinkage. In **object tanning**, debuting in _Disjointed_, the garment is sewn raw and tanned whole at the end, with ten to fifteen per cent excess in the pattern."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "En investigación se acepta perder entre el cincuenta y el sesenta por ciento de las muestras: el azar forma parte del método. Las botas protésicas encadenan todo el sistema —cosidas en crudo, con titanio insertado en tobillo o dedo, curtidas enteras y al final lijadas hasta descubrir el metal—.",
+      "In research a fifty to sixty per cent loss of samples is accepted: chance is part of the method. The prosthetic boots chain the whole system — sewn raw, with titanium inserted at ankle or toe, tanned whole and finally sanded until the metal is exposed."
+     ]
+    },
+    {
+     "k": "note",
+     "ref": "",
+     "tx": [
+      "De aquí proceden los sufijos de la nomenclatura: `-PTC` es _pronto per tintura in capo_, listo para teñirse en prenda, y `-PCC`, más raro, _pronto per concia in capo_.",
+      "The nomenclature suffixes come from here: `-PTC` is _pronto per tintura in capo_, ready for garment dyeing, and the rarer `-PCC`, _pronto per concia in capo_."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "materia",
+   "n": "06",
+   "t": [
+    "Materia y técnica",
+    "Matter and technique"
+   ],
+   "blocks": [
+    {
+     "k": "p",
+     "tx": [
+      "Poell desarrolla el noventa por ciento de los tejidos que usa desde el primer paso de su producción. El repertorio se ordena en cuatro dominios.",
+      "Poell develops ninety per cent of the fabrics he uses from the first step of their production. The repertoire falls into four domains."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Sastrería · las costuras",
+      "Tailoring · the seams"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La costura debe ser lo bastante fuerte para durar y lo bastante débil para ceder ante una tensión inesperada, y Poell exagera las dos funciones a la vez. No es un repertorio sino un sistema agotado: las seis costuras cubren las cuatro casillas de continuo/discontinuo y rígido/flexible. El cambio decisivo es topológico.",
+      "The seam must be strong enough to last and weak enough to give under unexpected tension, and Poell exaggerates both functions at once. It is not a repertoire but an exhausted system: the six seams cover the four cells of continuous/discontinuous and rigid/flexible. The decisive change is topological."
+     ]
+    },
+    {
+     "k": "table",
+     "cap": [
+      "Cuadro 2. Las seis costuras",
+      "Table 2. The six seams"
+     ],
+     "head": [
+      [
+       "Costura",
+       "Seam"
+      ],
+      [
+       "Qué es",
+       "What it is"
+      ],
+      [
+       "Efecto",
+       "Effect"
+      ]
+     ],
+     "rows": [
+      [
+       [
+        "Taped-seam",
+        "Taped-seam"
+       ],
+       [
+        "Costura normal reforzada con cinta transparente termosellada.",
+        "A regular seam reinforced with heat-sealed transparent tape."
+       ],
+       [
+        "Tradicionalmente impermeabiliza; aquí **exhibe** la costura que el forro escondía. Junta arquitectónica: une y separa a la vez.",
+        "Traditionally it waterproofs; here it **exhibits** the seam the lining hid. An architectural joint: it unites and separates at once."
+       ]
+      ],
+      [
+       [
+        "Meltlock-seam",
+        "Meltlock-seam"
+       ],
+       [
+        "Evolución de la anterior: la costura se sobrefunde con una cinta transparente más gruesa.",
+        "An evolution of the former: the seam is overmelted with a thicker transparent tape."
+       ],
+       [
+        "Refuerza el interior del overlock, que queda tan rígido como el scar-stitch.",
+        "It reinforces the inside of the overlock, which becomes as stiff as the scar-stitch."
+       ]
+      ],
+      [
+       [
+        "Scar-stitch",
+        "Scar-stitch"
+       ],
+       [
+        "Sobrehilado que da a la costura el aspecto visual de una cicatriz.",
+        "An overcast seam giving the seam the visual aspect of a scar."
+       ],
+       [
+        "Cosido por dentro, visible por fuera. Punto apretado, más rígido que el overlock.",
+        "Sewn inside, visible outside. Tight stitch, stiffer than the overlock."
+       ]
+      ],
+      [
+       [
+        "Overlock-seam",
+        "Overlock-seam"
+       ],
+       [
+        "«Visible Overlock Seam»: hilo más grueso y mayor separación entre puntos.",
+        "\"Visible Overlock Seam\": heavier thread and broader stance between stitches."
+       ],
+       [
+        "El rasgo más reconocible de la casa (`JM/2625` Dead End Jeans, `LM/2198` Leather Overlock Jacket).",
+        "The house's most recognisable feature (`JM/2625` Dead End Jeans, `LM/2198` Leather Overlock Jacket)."
+       ]
+      ],
+      [
+       [
+        "Invisible-seam",
+        "Invisible-seam"
+       ],
+       [
+        "Hilo de nailon translúcido y flexible; técnicamente, «costura abierta con márgenes encolados».",
+        "A translucent, flexible nylon thread; technically, \"open seam with glued-on seam allowances\"."
+       ],
+       [
+        "Sin tensión los bordes se juntan; con tensión se separan **sin romperse**, revelando la carne.",
+        "Without tension the edges join; under tension they open **without breaking**, revealing the flesh."
+       ]
+      ],
+      [
+       [
+        "Chain-seam",
+        "Chain-seam"
+       ],
+       [
+        "Hilo rígido de algodón, punto de cadeneta.",
+        "A rigid cotton thread, chain stitch."
+       ],
+       [
+        "Deja la costura **permanentemente abierta**. Más rígida que la invisible, acaba por romperse.",
+        "It leaves the seam **permanently open**. Stiffer than the invisible, it eventually breaks."
+       ]
+      ]
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/33-visible-overlock-seam-sobre-cuero-pali.jpg",
+     "cap": [
+      "«Visible Overlock Seam» sobre cuero pálido (`LM/2198`).",
+      "\"Visible Overlock Seam\" on pale leather (`LM/2198`)."
+     ],
+     "ref": "POELLINFO c. 33"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La cicatriz es la huella de una herida cuyos bordes se han reunido: aunque es discontinuidad, establece una continuidad de segunda especie. En 2014 el estudio recibió el correo de un cirujano cardíaco interesado en sus suturas.",
+      "The scar is the trace of a wound whose edges have been reunited: though a discontinuity, it establishes a continuity of the second kind. In 2014 the studio received an email from a cardiac surgeon interested in its sutures."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Sastrería · estructura, Self-Edge y Dead-End",
+      "Tailoring · structure, Self-Edge and Dead-End"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Desde 2003 la mayoría de las chaquetas no llevan forro: la construcción interior es el espectáculo, lo que Michel llama una estética obscena. Las sisas estrechas fuerzan una postura erguida, y el hombro híbrido combina delantero sastre con trasero raglán.",
+      "Since 2003 most jackets are unlined: the interior construction is the spectacle, which Michel calls an obscene aesthetic. Narrow armholes force an upright posture, and the hybrid shoulder combines a tailored front with a raglan back."
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/17-prenda-self-edge-el-orillo-a-la-vista.jpg",
+     "cap": [
+      "Prenda `SELF-EDGE`: el orillo, a la vista.",
+      "`SELF-EDGE` garment: the selvedge, in plain view."
+     ],
+     "ref": "POELLINFO c. 17"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Dos series opuestas cierran la obra. **SELF-EDGE** lleva el orillo donde no estaba: las bandas envuelven curvas sin deformar la pieza, lo que exige el doble o el cuádruple de metros. **DEAD-END** invierte el principio: en la prenda de una pieza con doble cicatriz es la discontinuidad entre ambas la que la vuelve continua.",
+      "Two opposed series close the work. **SELF-EDGE** takes the selvedge where it was not: the bands wrap curves without deforming the piece, which requires two to four times the cloth. **DEAD-END** inverts the principle: in the one-piece garment with a double scar it is the discontinuity between them that makes it continuous."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Sastrería · pantalones y perforación",
+      "Tailoring · trousers and perforation"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/26-genealogia-del-pantalon-retorcido-del.jpg",
+     "cap": [
+      "Genealogía del pantalón retorcido, del vendaje al patrón.",
+      "Genealogy of the twisted trouser, bandage to pattern."
+     ],
+     "ref": "POELLINFO c. 26"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Los pantalones sostuvieron parte de la fama inicial por alargar el cuerpo; los **tornado** son un _détournement_ de ese éxito, coherente con la insistencia de Poell en que nunca ha buscado hacer al portador más atractivo. La genealogía va de los «Bandage Strap Pants» de AW 00-01 a los Full y Half Spiral de 2009-2010.",
+      "Trousers sustained part of the early fame by lengthening the body; the **tornado** trousers are a _détournement_ of that success, consistent with Poell’s insistence that he has never sought to make the wearer more attractive. The genealogy runs from the \"Bandage Strap Pants\" of AW 00-01 to the Full and Half Spiral of 2009-2010."
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/14-cuero-perforado-de-off-scene-ss-08-tem.jpg",
+     "cap": [
+      "Cuero perforado de _Off-Scene_ (SS 08), temporada única.",
+      "Perforated leather from _Off-Scene_ (SS 08), a single season."
+     ],
+     "ref": "POELLINFO c. 14"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El **corte láser**, estrenado en _Traditional Escape_, produce hendiduras casi uniformes y deja bordes con aspecto inseguro; el **punzonado** da otro resultado. El cuero perforado tuvo una única temporada, con una coartada utilitaria que se desactiva sola: las suelas también estaban perforadas.",
+      "**Laser cutting**, introduced in _Traditional Escape_, produces near-uniform slits and leaves edges looking unsafe; **punching** gives another result. Perforated leather had a single season, with a utilitarian alibi that cancels itself: the soles were perforated too."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Tejido",
+      "Cloth"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/8-cuello-y-canto-en-surface-la-rigidez-q.jpg",
+     "cap": [
+      "Cuello y canto en `SURFACE`: la rigidez que sostiene la silueta.",
+      "Collar and edge in `SURFACE`: the rigidity holding the silhouette."
+     ],
+     "ref": "POELLINFO c. 8"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "`SURFACE`, 80% lana y 20% ramio, es grueso, pesado y seco: sostiene siluetas estatuarias y cuellos que no se arrugan; `KOAT`, algodón, tiene el mismo peso con tacto suave. En la familia -EDGE, `ACA-EDGE` es ligero, `PEDGE` el más tupido y `ROR-EDGE` envejece como un denim crudo.",
+      "`SURFACE`, 80% wool and 20% ramie, is thick, heavy and dry: it holds statuary silhouettes and collars that do not crumple; `KOAT`, cotton, has the same weight with a soft hand. In the -EDGE family, `ACA-EDGE` is light, `PEDGE` the densest and `ROR-EDGE` ages like raw denim."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Cuero · el código",
+      "Leather · the code"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El código declara modelo, material y color. En `LM/2498 CORS-PTC/12` el material `CORS-PTC` es caballo de la parte delantera y `/12` verde oscuro. Cada código de color es una fórmula de tintura: `10` es el negro para tejido y `010` el negro para cuero.",
+      "The code declares model, material and colour. In `LM/2498 CORS-PTC/12` the material `CORS-PTC` is horse from the front and `/12` dark green. Each colour code is a dye formula: `10` is black for cloth and `010` black for leather."
+     ]
+    },
+    {
+     "k": "table",
+     "cap": [
+      "Cuadro 3. Los cueros y su código",
+      "Table 3. The leathers and their code"
+     ],
+     "head": [
+      [
+       "Código",
+       "Code"
+      ],
+      [
+       "Especie y particularidad",
+       "Species and particularity"
+      ],
+      [
+       "Uso",
+       "Use"
+      ]
+     ],
+     "rows": [
+      [
+       "`BIAS-PTC`",
+       [
+        "Bisonte fino.",
+        "Thin bison."
+       ],
+       [
+        "Prenda y calzado",
+        "Clothing and footwear"
+       ]
+      ],
+      [
+       "`BIUS-PTC`",
+       [
+        "Bisonte más grueso que el anterior.",
+        "Bison thicker than the above."
+       ],
+       [
+        "Sólo calzado",
+        "Footwear only"
+       ]
+      ],
+      [
+       "`BUUS-PTC`",
+       [
+        "Bisonte grueso troquelado en patrón regular.",
+        "Thick bison die-cut in a regular pattern."
+       ],
+       [
+        "Sólo calzado",
+        "Footwear only"
+       ]
+      ],
+      [
+       "`CORS-PTC`",
+       [
+        "Caballo, de la parte delantera del cuerpo.",
+        "Horse, from the fore-part of the body."
+       ],
+       [
+        "Prenda y calzado",
+        "Clothing and footwear"
+       ]
+      ],
+      [
+       "`CORSS-PTC`",
+       [
+        "Igual que el anterior, más grueso.",
+        "As above, thicker."
+       ],
+       [
+        "Prenda",
+        "Clothing"
+       ]
+      ],
+      [
+       "`CUBS-PTC`",
+       [
+        "Cordobán en wet white, por el **revés** (lado de las callosidades).",
+        "Cordovan in wet white, on the **reversed** side (the calluses)."
+       ],
+       [
+        "Calzado",
+        "Footwear"
+       ]
+      ],
+      [
+       "`CUL-PTC`",
+       [
+        "Cordobán **vegetal**, por el revés y para colores muy oscuros.",
+        "Cordovan, **vegetable**, reversed side and very dark colours."
+       ],
+       [
+        "Calzado",
+        "Footwear"
+       ]
+      ],
+      [
+       "`SBUC-PTC`",
+       [
+        "Cordobán en wet white, usado por el lado **flor**.",
+        "Cordovan in wet white, used on the **full grain** side."
+       ],
+       [
+        "Calzado",
+        "Footwear"
+       ]
+      ],
+      [
+       "`LUC-PTC`",
+       [
+        "Cordobán **vegetal**, lado flor y colores muy oscuros.",
+        "Cordovan, **vegetable**, full grain side and very dark colours."
+       ],
+       [
+        "Calzado",
+        "Footwear"
+       ]
+      ],
+      [
+       "`ROOLS-PTC`",
+       [
+        "Canguro fino, 0,4-0,5 mm de espesor.",
+        "Thin kangaroo, 0.4-0.5 mm thick."
+       ],
+       [
+        "Prenda",
+        "Clothing"
+       ]
+      ],
+      [
+       "`ROOMS-PTC`",
+       [
+        "Canguro, 0,8-0,9 mm.",
+        "Kangaroo, 0.8-0.9 mm."
+       ],
+       [
+        "Prenda y calzado",
+        "Clothing and footwear"
+       ]
+      ],
+      [
+       "`RUUMS-PTC`",
+       [
+        "Canguro troquelado en patrón regular.",
+        "Kangaroo die-cut in a regular pattern."
+       ],
+       [
+        "Sólo calzado",
+        "Footwear only"
+       ]
+      ],
+      [
+       "`PACAL-PTC`",
+       [
+        "Ternera acoplada a un polietileno que, al no resistir la tracción, **produce desgarros únicos** en la puntera.",
+        "Calf paired with a polythene which, lacking traction resistance, **creates unique rips** at the toecap."
+       ],
+       [
+        "Calzado",
+        "Footwear"
+       ]
+      ]
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El archivo wikipoell verifica el sistema sobre 816 registros: 502 prendas de CCP-ROOM y 314 de The Library 1994. El cruce de prefijos con categoría resuelve la primera letra del modelo, que ninguna fuente escrita explica: **A** calzado y chalecos, **L** cuero exterior, **P** pantalón, **M** joyería, **G** chaqueta, **O** y **V** tops y abrigos, **K** punto, **T** y **C** camisa, **J** denim, **S** falda, **D** vestido; la segunda letra es el género. Los sufijos describen la construcción: `R` drip, `L` forrado, `P` protésico, `SP` _spur-biter_, `SED` self-edge, `T` suela tank. En composición: canguro 133, caballo 99, bisonte 91, algodón 86 y cabello humano 4, con el calzado en el 39 %.",
+      "The wikipoell archive verifies the system over 816 records: 502 garments from CCP-ROOM and 314 from The Library 1994. Cross-tabulating prefixes against category resolves the first letter of the model, which no written source explains: **A** footwear and vests, **L** outer leather, **P** trousers, **M** jewellery, **G** jacket, **O** and **V** tops and coats, **K** knitwear, **T** and **C** shirt, **J** denim, **S** skirt, **D** dress; the second letter is gender. The suffixes describe construction: `R` drip, `L` lined, `P` prosthetic, `SP` _spur-biter_, `SED` self-edge, `T` tank sole. In composition: kangaroo 133, horse 99, bison 91, cotton 86 and human hair 4, with footwear at 39 %."
+     ]
+    },
+    {
+     "k": "note",
+     "ref": "",
+     "tx": [
+      "**Wet white** es piel curtida sin cromo: queda clara y admite después cualquier tono, que es lo que exige el _object dyeing_. **Wet blue**, el estándar industrial curtido al cromo, no se emplea. El **curtido vegetal** es más lento y se reserva a los colores muy oscuros.",
+      "**Wet white** is chrome-free tanned hide: it stays pale and takes any tone afterwards, which is what _object dyeing_ requires. **Wet blue**, the chrome-tanned industrial standard, is not used. **Vegetable tanning** is slower and is reserved for very dark colours."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Cuero · cordobán y cueros extremos",
+      "Leather · cordovan and extreme leathers"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/5-cuero-transparente-piel-adelgazada-has.jpg",
+     "cap": [
+      "Cuero transparente: piel adelgazada hasta la translucidez.",
+      "Transparent leather: hide thinned to translucency."
+     ],
+     "ref": "POELLINFO c. 5"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El **cordobán** es piel equina de la grupa: admite mal el tinte, se tiñe a mano y por dentro, y el proceso dura seis meses. Detalle nemotécnico: `CUL-PTC` y `LUC-PTC` son la misma palabra al derecho y al revés, igual que las dos caras que designan.",
+      "**Cordovan** is equine hide from the rump: it takes dye poorly, is dyed by hand and from the inside, and the process takes six months. Mnemonic detail: `CUL-PTC` and `LUC-PTC` are the same word forwards and backwards, like the two faces they designate."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El **cuero transparente** se obtiene retirando el pigmento a la piel hasta hacerla translúcida, por un método arcaico mostrado en _Best Before 16/10/00_. El **teñido en sangre** unta el interior del cuero con sangre animal; el **tinte inyectado** introduce pintura por las venas de la piel.",
+      "**Transparent leather** is obtained by removing the pigment from the hide until it is translucent, by an archaic method shown in _Best Before 16/10/00_. **Blood tanning** smears the inside of the hide with animal blood; **injected dyeing** introduces paint through the veins of the hide."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Calzado y agregados",
+      "Footwear and add-ons"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/32-caucho-drip-estalactitas-hechas-para-g.jpg",
+     "cap": [
+      "Caucho «drip»: estalactitas hechas para gastarse hasta desaparecer.",
+      "Drip rubber: stalactites made to wear away until they disappear."
+     ],
+     "ref": "POELLINFO c. 32"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "El **caucho drip** debuta en _Selfsame_: zapatos, botas, bolsos, chaquetas y guantes se sumergen en un caucho que solidifica en estalactitas. La función existe —sella la suela porosa— pero desaparece en chaquetas y guantes. Las lecturas simbólicas se acumulan: sangre goteando de una res, los dedos de hada de los potros, la entropía.",
+      "**Drip rubber** debuts in _Selfsame_: shoes, boots, bags, jackets and gloves are dipped in a rubber that solidifies into stalactites. The function exists — it seals the porous sole — but disappears on jackets and gloves. Symbolic readings accumulate: blood dripping from a carcass, the fairy fingers of foals, entropy."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Las **prótesis** craneofaciales invierten su función: una prótesis real imita su equivalente natural para disimular una malformación, y la casa la abandona y las expone como joyería. Las de titanio responden a un problema real: la puntera almendrada tiende a agrietarse donde se coloca la prótesis del empeine.",
+      "The craniofacial **prostheses** invert their function: a real prosthesis imitates its natural counterpart to disguise a malformation, and the house abandons that and displays them as jewellery. The titanium ones answer a real problem: the almond toe tends to crack where the instep prosthesis sits."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Los **accesorios** se ordenan en cinco categorías: **utilidad banal** —imperdible sobredimensionado, bolígrafo de plata—; **restricción** —guantes que impiden activar las falanges, collar isabelino—; **disfraz irónico** —nariz de payaso, máscara perforada—; **violencia** —el puño americano y el collar de dos kilos de SS 07—; y **sacrificio** —la pata de animal de la suerte y la boa de intestino—.",
+      "**Accessories** fall into five categories: **banal utility** — oversized safety pin, silver ballpoint; **restriction** — gloves preventing the phalanges from working, Elizabethan collar; **ironic costume** — clown nose, perforated mask; **violence** — the knuckleduster and the two-kilo necklace of SS 07; and **sacrifice** — the lucky animal leg and the intestine boa."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Tres **materiales límite**. La **fibra de vidrio** del abrigo de 2009: cortarla exigía guantes, mascarilla y gafas, y la prenda no puede llevarse. El **intestino de cerdo**, que la casa llama `DARM`, convertido en punto pierde todo shock visual. Y el **cabello humano**, sustituto de la lana en el abrigo de FW 00-01.",
+      "Three **limit materials**. The **fibreglass** of the 2009 coat: cutting it required gloves, mask and goggles, and the garment cannot be worn. **Pig intestine**, which the house calls `DARM`, knitted loses all visual shock. And **human hair**, substituting for wool in the FW 00-01 coat."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "obra",
+   "n": "07",
+   "t": [
+    "Obra",
+    "Work"
+   ],
+   "blocks": [
+    {
+     "k": "p",
+     "tx": [
+      "Poell no ha hecho nunca una pasarela convencional. Sus presentaciones son el lugar donde la obra se vuelve argumento y deben estudiarse como piezas, no como marco. Casi todas están filmadas.",
+      "Poell has never staged a conventional runway show. His presentations are where the work becomes argument and must be studied as pieces, not as frame. Almost all of them are filmed."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Los espacios",
+      "The venues"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Poell rechaza el desfile porque no trata de la ropa: es un drama que desvía la atención. Sólo recurre a un espacio cuando su atmósfera completa lo que intenta expresar, y el denominador común es la libertad pública.",
+      "Poell rejects the runway because it is not about the clothes: it is a drama that diverts attention. He turns to a space only when its atmosphere completes what he is trying to express, and the common denominator is public freedom."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Presentaciones",
+      "Presentations"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**Three Refrigerated Cells**, 28 de junio de 2000. Tres cámaras frigoríficas en un matadero: en la primera la colección, casi toda de cuero; en la segunda los animales que tuvieron que morir para esos diseños, cubiertos con gasa; en la tercera un espejo. **Public Freedom**, 17 de enero de 2001, en una perrera, con hombres abatidos en las celdas y un bucle de ladridos; debutan el colgante de dientes y los pantalones sin entrepierna.",
+      "**Three Refrigerated Cells**, 28 June 2000. Three cold rooms in a slaughterhouse: in the first the collection, almost all leather; in the second the animals that had to die for those designs, covered in gauze; in the third a mirror. **Public Freedom**, 17 January 2001, in a dog pound, with dejected men in the cells and a loop of barking; the teeth pendant and the crotchless trousers debut here."
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/15-traditional-escape-ss-02-el-descenso-c.jpg",
+     "cap": [
+      "_Traditional Escape_ (SS 02): el descenso con los ojos vendados.",
+      "_Traditional Escape_ (SS 02): the blindfolded descent."
+     ],
+     "ref": "POELLINFO c. 15"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**Traditional Escape**, SS 02: cada modelo desciende con los ojos vendados desde el primer piso del antiguo estudio. Las prendas importan más que el espectáculo —corte láser, punzonado, cuero tejido, malla, cuero transparente— y son la primera aparición de calzados que sugieren prótesis.",
+      "**Traditional Escape**, SS 02: each model descends blindfolded from the first floor of the old studio. The garments matter more than the spectacle — laser cutting, punching, woven leather, mesh, transparent leather — and mark the first appearance of footwear suggesting prosthesis."
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/31-mainstream-downstream-ss-04-los-cuerpo.jpg",
+     "cap": [
+      "_Mainstream-Downstream_ (SS 04): los cuerpos por el Naviglio.",
+      "_Mainstream-Downstream_ (SS 04): the bodies down the Naviglio."
+     ],
+     "ref": "POELLINFO c. 31"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**Mainstream-Downstream**, SS 04. Diecisiete modelos muertos flotan por el Naviglio Grande con conjuntos que se arruinaban al sumergirse: la moda mainstream fluye toda en la misma dirección, inconscientemente. Sin pasarela, seguridad ni asientos, cualquier transeúnte podía detenerse a mirar. Fue su última presentación crítica.",
+      "**Mainstream-Downstream**, SS 04. Seventeen dead models float down the Naviglio Grande in outfits ruined by submersion: mainstream fashion all flows the same way, unconsciously. With no runway, security or seating, any passer-by could stop and watch. It was his last critical presentation."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**U-Turn**, SS 06, es la colección mejor documentada visualmente, gracias al editorial de FLUX. **Selfsame**, 2009, se presenta en una fábrica ruinosa con la ropa colgada de ganchos de carnicero; nacen SELF-EDGE y el caucho drip. **Dead End**, 2010, es la última colección: prendas de una pieza con doble cicatriz y botas Goodyear protésicas.",
+      "**U-Turn**, SS 06, is the best visually documented collection, thanks to the FLUX editorial. **Selfsame**, 2009, is staged in a dilapidated factory with the clothes hung from meat hooks; SELF-EDGE and drip rubber are born. **Dead End**, 2010, is the last collection: one-piece garments with a double scar and prosthetic Goodyear boots."
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/7-el-caballo-curtido-en-objeto-cosido-co.jpg",
+     "cap": [
+      "El caballo curtido en objeto, cosido con scar-stitch.",
+      "The object-tanned horse, sewn with the scar-stitch."
+     ],
+     "ref": "POELLINFO c. 7"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**Squartter**, 14 de abril de 2010, presenta la pieza más extrema: un caballo-objeto. Parece taxidermia pero no lo es — el animal se desuella y se curte en una sola pieza y se cose con el scar-stitch, empleado aquí no para unir sino para curar la costura. El camino que lleva del animal a la forma humana se invierte.",
+      "**Squartter**, 14 April 2010, presents the most extreme piece: a horse-object. It looks like taxidermy but is not — the animal is flayed and tanned in a single piece and sewn with the scar-stitch, used here not to join but to heal the seam. The path from animal to human form is inverted."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "FE-MALE y la silueta",
+      "FE-MALE and the silhouette"
+     ]
+    },
+    {
+     "k": "figure",
+     "src": "archivo/poellinfo/24-fe-male-aw-01-02.jpg",
+     "cap": [
+      "FE-MALE AW 01-02.",
+      "FE-MALE AW 01-02."
+     ],
+     "ref": "POELLINFO c. 24"
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La línea de mujer nace en 1998-99 y arrastra la reputación de ser la masculina apenas retocada; hay algo de verdad, pero las adaptaciones están en las antípodas de la ropa de mujer clásica. La palabra clave de AW 01-02 es peculiar: una feminidad que permanece fragmentada en vez de coagular en la mujer total.",
+      "The women’s line begins in 1998-99 and carries the reputation of being the men’s line barely retouched; there is some truth in it, but the adaptations are at the antipodes of classic womenswear. The key word of AW 01-02 is peculiar: a femininity that stays fragmented rather than coalescing into the total woman."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La silueta poelliana no es extravagante: es un _détournement_ preciso de la silueta clásica masculina, ajustado hacia la entropía y no hacia el darkwear gótico. Corte largo y delgado, hombros altos y estrechos, mangas largas, asimetría. La camisa `PO-TURN`, exclusiva de @thelibrary1994, refuta el tópico.",
+      "The Poellean silhouette is not extravagant: it is a precise _détournement_ of the classic menswear silhouette, adjusted towards entropy rather than gothic darkwear. A long, lean cut, high narrow shoulders, long sleeves, asymmetry. The `PO-TURN` shirt, exclusive to @thelibrary1994, refutes the cliché."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "recepcion",
+   "n": "08",
+   "t": [
+    "Recepción y legado",
+    "Reception and legacy"
+   ],
+   "blocks": [
+    {
+     "k": "sub",
+     "tx": [
+      "Distribución",
+      "Distribution"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La red no llega a cincuenta tiendas: Leclaireur–Hérold, Darklands, The Library 1994, Lift Daikanyama, Shelter II, Ink Clothing, SUUS, Project 314, Atelier New York, H. Lorenzo, Antonioli y Lazzari. Desde 2010 sólo circulan reediciones. La escasez es real y procede de un límite material, no de una demanda artificial.",
+      "The network does not reach fifty stores: Leclaireur–Hérold, Darklands, The Library 1994, Lift Daikanyama, Shelter II, Ink Clothing, SUUS, Project 314, Atelier New York, H. Lorenzo, Antonioli and Lazzari. Since 2010 only reissues circulate. The scarcity is real and comes from a material limit, not artificial demand."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Influencia y copia",
+      "Influence and copying"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Operan dos mecanismos. La **copia industrial silenciosa**: Lehmann documenta una marca estadounidense que compra piezas en la tienda Lift de Tokio, las reduce formalmente y encarga a Bonotto tejidos desarrollados con CCP; rige la ley de la visibilidad, según la cual la marca más visible retiene la reclamación de originalidad. Y el **goteo estilístico**: el caucho drip, replicado por O.X.S., Both Paris, 1017 ALYX 9SM y Golden Goose, vuelve a ser mero signo estético.",
+      "Two mechanisms operate. **Silent industrial copying**: Lehmann documents a US brand that buys pieces at the Lift store in Tokyo, formally reduces them and commissions from Bonotto fabrics developed with CCP; the law of visibility applies, whereby the most visible brand retains the claim to originality. And **stylistic trickle-down**: drip rubber, replicated by O.X.S., Both Paris, 1017 ALYX 9SM and Golden Goose, returns to being a mere aesthetic sign."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Aportes",
+      "Contribution"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Cinco aportes concretos. **Materiales que no existían**: cuero transparente, cuero elástico, curtido en sangre, tinte inyectado, punto de intestino y una familia entera de tejidos propios. **La inversión del proceso**: de _object dyeing_, _tanning_ y _tempering_ derivan casi todas las demás técnicas. **Un sistema de costuras completo**. **La presentación como argumento**. **Un modelo económico alternativo**: sin publicidad ni calendario, la facturación creció año tras año después de dejar de diseñar.",
+      "Five concrete contributions. **Materials that did not exist**: transparent leather, elastic leather, blood tanning, injected dyeing, intestine knit and a whole family of proprietary fabrics. **The inversion of process**: almost every other technique derives from _object dyeing_, _tanning_ and _tempering_. **A complete system of seams**. **Presentation as argument**. **An alternative economic model**: with no advertising or calendar, turnover grew year on year after he stopped designing."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "La definición más ajustada la da Michel al cerrar su ensayo: Poell es un sastre que da a luz formas nuevas transformando la materia, y el material sobre el que trabaja es el cuerpo humano.",
+      "The most exact definition is Michel’s, closing his essay: Poell is a tailor who gives birth to new forms by transforming matter, and the material he works on is the human body."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "aparato",
+   "n": "09",
+   "t": [
+    "Aparato crítico",
+    "Critical apparatus"
+   ],
+   "blocks": [
+    {
+     "k": "p",
+     "tx": [
+      "Lo que conviene verificar antes de citar cualquier dato: bulos consolidados y frentes que el archivo declara abiertos.",
+      "What should be verified before citing any datum: entrenched hoaxes and fronts the archive declares open."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Bulos",
+      "Hoaxes"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**El animal vivo** es falso. El caso es la chaqueta proto-esgrima de FW 98-99, de cuero veteado; el origen es un anuncio de subasta japonés que sugería tinta inyectada en una piel antes del curtido, y la afirmación mutó en redes hasta el relato del animal vivo. La veteadura del cuero curtido al cromo es un defecto reconocido de la industria, y nada de esto invalida el tinte inyectado. **La incomodidad intencionada** está matizada por el estudio: es diferida, no negada. **El darkwear gótico** tiene su contraejemplo en la camisa `PO-TURN`.",
+      "**The live animal** is false. The case is the proto-fencing jacket of FW 98-99, in veined leather; the origin is a Japanese auction listing suggesting ink injected into a hide before tanning, and the claim mutated on social media into the living-animal story. Veining in chrome-tanned leather is a recognised industry defect, and none of this invalidates injected dyeing. **Intentional discomfort** is qualified by the studio: it is deferred, not denied. **Gothic darkwear** has its counterexample in the `PO-TURN` shirt."
+     ]
+    },
+    {
+     "k": "sub",
+     "tx": [
+      "Frentes abiertos",
+      "Open fronts"
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "**_Squartter_**, 14 de abril de 2010 frente a la invitación reproducida en 2011. La **boa de FE-MALE AW 01-02** se atribuyó a anguila y luego a cerdo, versión confirmada por el estudio.",
+      "**_Squartter_**, 14 April 2010 versus the invitation reproduced in 2011. The **FE-MALE AW 01-02 boa** was attributed to eel and then to pig, the version confirmed by the studio."
+     ]
+    },
+    {
+     "k": "p",
+     "tx": [
+      "Quedan abiertos: la **concepción poelliana de la violencia**, entre Nitsch, el nihilismo político y el SM; la **soberanía animal**; **`TRIGGER`**, título que aparece únicamente en la videoteca; y las temporadas **AW 99-00** y **SS 01**. La lógica de los **prefijos de modelo** es una hipótesis inducida sobre wikipoell, no una clave publicada por la casa.",
+      "Still open: the **Poellean conception of violence**, between Nitsch, political nihilism and SM; **animal sovereignty**; **`TRIGGER`**, a title appearing only in the video list; and the **AW 99-00** and **SS 01** seasons. The logic of the **model prefixes** is a hypothesis induced from wikipoell, not a key published by the house."
+     ]
+    }
+   ]
+  }
+,
+  {
+   "id": "biblio",
+   "n": "10",
+   "t": [
+    "Bibliografía",
+    "Bibliography"
+   ],
+   "blocks": [
+    {
+     "k": "sources",
+     "rows": [
+      [
+       "MICHEL",
+       [
+        "Michel, Christian. _Thought Without Concept_. Londres: Bloomsbury, 2016, pp. 119-135.",
+        "Michel, Christian. _Thought Without Concept_. London: Bloomsbury, 2016, pp. 119-135."
+       ],
+       [
+        "Costuras, Accionismo vienés, memoria histórica y paradoja.",
+        "Seams, Viennese Actionism, historical memory and paradox."
+       ]
+      ],
+      [
+       "LEHMANN",
+       [
+        "Lehmann, Ulrich. _Fashion and Materialism_. Edimburgo: EUP. Caps. pp. 172-196 y 197-226.",
+        "Lehmann, Ulrich. _Fashion and Materialism_. Edinburgh: EUP. Chs. pp. 172-196 and 197-226."
+       ],
+       [
+        "Taller, Bonotto, negación y _Entziehung_.",
+        "Workshop, Bonotto, negation and _Entziehung_."
+       ]
+      ],
+      [
+       "POELLINFO",
+       [
+        "Archivo @poellinfo. 309 imágenes, 4 clips, 36 entradas y 10 láminas de _Achtung_ (2003).",
+        "@poellinfo archive. 309 images, 4 clips, 36 entries and 10 plates from _Achtung_ (2003)."
+       ],
+       [
+        "Colecciones, tejidos, prótesis, espacios y bulos; cada grupo numerado, una entrada.",
+        "Collections, fabrics, prostheses, venues and hoaxes; each numbered group, one entry."
+       ]
+      ],
+      [
+       "WIKIPOELL",
+       [
+        "wikipoell. Archivo web sobre la obra de CCP (Next.js, MongoDB): 502 prendas de CCP-ROOM y 314 de The Library 1994.",
+        "wikipoell. A web archive on CCP's work (Next.js, MongoDB): 502 garments from CCP-ROOM and 314 from The Library 1994."
+       ],
+       [
+        "El código de producto sobre 816 registros.",
+        "The product code over 816 records."
+       ]
+      ],
+      [
+       "KITCHELL",
+       [
+        "Kitchell, M. _Accessory, Abjection_. Corpstext, 2025.",
+        "Kitchell, M. _Accessory, Abjection_. Corpstext, 2025."
+       ],
+       [
+        "Los accesorios en cinco categorías; la silueta.",
+        "The accessories in five categories; the silhouette."
+       ]
+      ],
+      [
+       "LAZZARI",
+       [
+        "_Online guide for CCP leather shoes and garments_. Lazzari Store, Treviso.",
+        "_Online guide for CCP leather shoes and garments_. Lazzari Store, Treviso."
+       ],
+       [
+        "Código de producto, trece cueros y colores.",
+        "Product code, thirteen leathers and colours."
+       ]
+      ],
+      [
+       "OAC",
+       [
+        "Banks, Christopher. _The Alchemical Designer_. Objects of Affection, Study 044, 2025.",
+        "Banks, Christopher. _The Alchemical Designer_. Objects of Affection, Study 044, 2025."
+       ],
+       [
+        "Baudrillard, Byung-Chul Han, wabi-sabi, Arte Povera; aparato del autor.",
+        "Baudrillard, Byung-Chul Han, wabi-sabi, Arte Povera; the author's apparatus."
+       ]
+      ],
+      [
+       "GRAILED",
+       [
+        "Park, Gunner. _The History of Carol Christian Poell_. Grailed, 2017.",
+        "Park, Gunner. _The History of Carol Christian Poell_. Grailed, 2017."
+       ],
+       [
+        "Panorámica biográfica; menos fiable en fechas.",
+        "A biographical overview; less reliable on dates."
+       ]
+      ],
+      [
+       "NICHE",
+       [
+        "_El nicho de la moda de culto_. Ficha en español con FAQ y directorio.",
+        "_El nicho de la moda de culto_. Spanish profile with FAQs and directory."
+       ],
+       [
+        "Resumen rápido y lista de puntos de venta.",
+        "A quick summary and the stockist list."
+       ]
+      ],
+      [
+       "LPA",
+       [
+        "Cobos, Gonzalo. _#DESIGNERBIO_. Le Petit Archive.",
+        "Cobos, Gonzalo. _#DESIGNERBIO_. Le Petit Archive."
+       ],
+       [
+        "Ficha breve de técnicas y piezas singulares.",
+        "A short profile of techniques and singular pieces."
+       ]
+      ],
+      [
+       "FLUX",
+       [
+        "_U-Turn, S/S 06 collection_. FLUX nº 54, 2006. Fotografía de Stefan Zeisler.",
+        "_U-Turn, S/S 06 collection_. FLUX no. 54, 2006. Photography by Stefan Zeisler."
+       ],
+       [
+        "La lista de piezas de _U-Turn_, página a página.",
+        "The _U-Turn_ piece list, page by page."
+       ]
+      ],
+      [
+       "FASHIONNOW2",
+       [
+        "Ross, Marcus. En _Fashion Now 2_. Colonia: Taschen, pp. 138-139.",
+        "Ross, Marcus. In _Fashion Now 2_. Cologne: Taschen, pp. 138-139."
+       ],
+       [
+        "Ficha en cuatro idiomas y el cuestionario.",
+        "A four-language profile and the questionnaire."
+       ]
+      ],
+      [
+       "LANDED",
+       [
+        "_Landed–Geland_. Catálogo de la exposición. Amberes, 2001.",
+        "_Landed–Geland_. Exhibition catalogue. Antwerp, 2001."
+       ],
+       [
+        "CCP entre sus contemporáneos; un conjunto de 2000-2001.",
+        "Places CCP among his contemporaries; an outfit from 2000-2001."
+       ]
+      ],
+      [
+       "(contexto)",
+       [
+        "_Moda: historia de los diseños y estilos_.",
+        "_Moda: historia de los diseños y estilos_."
+       ],
+       [
+        "**No menciona a Poell.** Marco histórico y vocabulario.",
+        "**It does not mention Poell.** Historical frame and vocabulary."
+       ]
+      ]
+     ]
+    },
+    {
+     "k": "note",
+     "ref": "",
+     "tx": [
+      "Una sola aportación no procede del archivo: las definiciones de **wet white** y **wet blue** del tema 6, tomadas de literatura técnica del sector del curtido. Se incorporan porque LAZZARI clasifica todos los cueros de CCP por ese criterio sin glosarlo nunca, y sin la definición el cuadro 3 resulta ilegible. El único enlace externo al archivo es el sitio oficial de la casa.",
+      "Only one contribution does not come from the archive: the definitions of **wet white** and **wet blue** in theme 6, taken from technical literature of the tanning sector. They are included because LAZZARI classifies every CCP leather by that criterion without ever glossing it, and without the definition table 3 is unreadable. The only link outside the archive is the official website of the house."
+     ]
+    }
+   ]
+  }
+ ]
+};
 
-/* ------------------------------------------------ 1 */
-{ id: "perfil", n: "01", t: ["Perfil", "Profile"], blocks: [
-  { k: "fields", rows: [
-    [["Nombre y firma","Name and signature"], ["Carol Christian Poell. Firma C.C.P.: acrónimo deliberado, para no fetichizar la figura del diseñador.","Carol Christian Poell. Signs C.C.P.: a deliberate acronym, so as not to fetishise the figure of the designer."]],
-    [["Nacimiento","Born"], ["Linz, Austria, 1966.","Linz, Austria, 1966."]],
-    [["Origen","Background"], ["Familia de curtidores (padre, abuelo, tíos). Padrastro en una fábrica de ropa. Un abuelo médico.","A family of tanners (father, grandfather, uncles). Stepfather in a clothing factory. One grandfather a doctor."]],
-    [["Formación","Training"], ["Graz → sastrería de hombre y de mujer en Michelbeuern, Viena → Domus Academy, Milán.","Graz → men's and women's tailoring at Michelbeuern, Vienna → Domus Academy, Milan."]],
-    [["Empresa","Company"], ["C.C.P. srl, con Sergio Simone. Base en Milán, barrio del Naviglio.","C.C.P. srl, with Sergio Simone. Based in Milan, the Naviglio district."]],
-    [["Debut","Debut"], ["FW 94-95, Unintended Collection: pantalón, chaqueta, camisa y camiseta.","FW 94-95, Unintended Collection: trousers, jacket, shirt and T-shirt."]],
-    [["Líneas","Lines"], ["MALE y FE-MALE (desde 1998-99, derivada de la masculina).","MALE and FE-MALE (from 1998-99, derived from the men's line)."]],
-    [["Corte","Cut-off"], ["2010: da el diseño por terminado; desde entonces sólo reedita.","2010: he declares the design finished; since then he only reissues."]],
-    [["Distribución","Distribution"], ["Menos de 40-50 tiendas. Sin publicidad, celebrities, préstamos ni calendario de temporada.","Fewer than 40-50 stores. No advertising, celebrities, loans or seasonal calendar."]],
-    [["Autodefinición","Self-definition"], ["«Ricercatore» — investigador. O «diseñador industrial».","“Ricercatore” — researcher. Or “industrial designer”."]]
-  ]},
-  { k: "note", ref: "POELLINFO · GRAILED", tx: [
-    "La biografía completa —la curtiduría del abuelo, el matadero, la disyuntiva entre curtidor y sastre a los catorce— está en la serie de diez láminas de POELLINFO y, en versión narrativa, en GRAILED.",
-    "The full biography — his grandfather's tannery, the slaughterhouse, the choice between tanner and tailor at fourteen — is in POELLINFO's series of ten plates and, in narrative form, in GRAILED."
-  ]}
-]},
-
-/* ------------------------------------------------ 2 */
-{ id: "cronologia", n: "02", t: ["Cronología", "Chronology"], blocks: [
-  { k: "timeline", rows: [
-    ["FW 94-95", ["Unintended Collection","Unintended Collection"], ["Cuatro piezas. Compradores japoneses la agotan por casualidad.","Four pieces. Japanese buyers sell it out by accident."]],
-    ["1995-96", ["1st Intended Collection","1st Intended Collection"], ["Primera completa. Desde aquí desarrolla él mismo sus tejidos.","The first complete one. From here on he develops his own fabrics."]],
-    ["SS 98", ["Improper (MALE)","Improper (MALE)"], ["Aberturas que revelan zonas sexualizadas del cuerpo masculino.","Openings revealing sexualised zones of the male body."]],
-    ["1998-99", ["Primera FE-MALE","First FE-MALE"], ["Por fases: bajos, después chaquetas y blusas, después el cuerpo entero.","In phases: bottoms, then jackets and blouses, then the whole body."]],
-    ["SS 00", ["Trilogy of Monotypologies 2","Trilogy of Monotypologies 2"], ["Cuero transparente teñido en sangre.","Transparent leather dyed in blood."]],
-    ["28.06.2000", ["Three Refrigerated Cells","Three Refrigerated Cells"], ["Matadero: la colección · los animales desollados en gasa · una silla frente a un espejo.","Slaughterhouse: the collection · the flayed animals in gauze · a chair facing a mirror."]],
-    ["14-16.10.2000", ["Best Before 16/10/00","Best Before 16/10/00"], ["Presentación del cuero transparente.","Presentation of the transparent leather."]],
-    ["AW 00-01", ["Pure / Impure","Pure / Impure"], ["Puño americano de bronce; derbies sin suela; primeros pantalones-vendaje.","Bronze knuckleduster; soleless derbies; first bandage trousers."]],
-    ["FW 00-01", ["Trilogy III","Trilogy III"], ["Abrigo sin mangas de cabello humano.","Sleeveless coat made of human hair."]],
-    ["17.01.2001", ["Public Freedom","Public Freedom"], ["Presentación en una perrera. Debuta el colgante de dientes.","Staged in a dog pound. The teeth pendant debuts."]],
-    ["AW 01-02", ["A Peculiar Femininity","A Peculiar Femininity"], ["Boa de intestino de cerdo, gorguera isabelina, bolso de lechón, sujetador de metal.","Pig-intestine boa, Elizabethan ruff, suckling-pig bag, metal bra."]],
-    ["SS 02", ["Traditional Escape","Traditional Escape"], ["Modelos descolgándose por la ventana. Corte láser; primeras prótesis de calzado.","Models abseiling out of the window. Laser cutting; first footwear prostheses."]],
-    ["SS 04", ["Mainstream-Downstream","Mainstream-Downstream"], ["17 modelos «muertos» flotando por el Naviglio Grande. Última presentación crítica.","17 “dead” models floating down the Naviglio Grande. His last critical presentation."]],
-    ["AW 04-05", ["Instant Collection","Instant Collection"], ["Lookbook en un armario forense. Entran los colores 15 y 16.","Lookbook shot in a forensic cabinet. Colours 15 and 16 enter."]],
-    ["2005", ["Mujer / Women","Women"], ["Curtido en sangre: interior del cuero untado con sangre animal.","Blood tanning: the inside of the hide smeared with animal blood."]],
-    ["SS 06", ["U-Turn","U-Turn"], ["Corbata de cabello humano, anillo de ojo, cinturón espiral.","Human-hair tie, eye ring, spiral belt."]],
-    ["SS 07", ["Paranoid","Paranoid"], ["Collar de 2 kg que deja marcas de presión en el cuello.","A 2 kg collar that leaves pressure marks on the neck."]],
-    ["FW 07-08", ["Disjointed","Disjointed"], ["Object tanning, object tempering y articulaciones. La colección técnicamente decisiva.","Object tanning, object tempering and articulations. The technically decisive collection."]],
-    ["SS 08", ["Off-Scene","Off-Scene"], ["Cuero perforado, forro KITE-S, costuras encoladas.","Perforated leather, KITE-S lining, glued seams."]],
-    ["2009", ["Selfsame","Selfsame"], ["Nacen SELF-EDGE y el caucho drip. Abrigo de fibra de vidrio.","SELF-EDGE and drip rubber are born. Fibreglass coat."]],
-    ["2010", ["Dead End","Dead End"], ["Prendas «one piece» con doble cicatriz. Y el fin del desarrollo.","“One piece” garments with a double scar. And the end of development."]],
-    ["14.04.2010", ["Squartter","Squartter"], ["El caballo curtido en objeto, vendido con ironía como sofá.","The object-tanned horse, sold with irony as a sofa."]],
-    ["2012", ["Inedito / Unseen","Inedito / Unseen"], ["El caballo en espacio comercial; objetos encapsulados en caucho.","The horse in a commercial space; objects encased in rubber."]],
-    ["2024", ["In-Between","In-Between"], ["Cápsula final: delantal de bisonte, Sifter Arms, reedición de Buckle Boots.","Final capsule: bison apron, Sifter Arms, Buckle Boots reissue."]]
-  ]},
-  { k: "note", ref: "MICHEL pp. 13-19 · POELLINFO", tx: [
-    "La cronología razonada, con las fechas exactas de cada presentación y las fuentes de cada dato, en MICHEL y en las 36 entradas de POELLINFO.",
-    "The reasoned chronology, with exact dates for each presentation and the source of every datum, in MICHEL and in POELLINFO's 36 entries."
-  ]}
-]},
-
-/* ------------------------------------------------ 3 */
-{ id: "metodo", n: "03", t: ["Filosofía y método", "Philosophy and method"], blocks: [
-  { k: "sub", tx: ["Principios", "Principles"] },
-  { k: "entries", rows: [
-    [["Negación","Negation"], ["No se parte de una idea buscando cómo realizarla: se eliminan las soluciones posibles hasta que la que queda es forzosamente la correcta. «La negación de las posibilidades creativas es lo que crea el tipo, la forma y el diseño de una pieza.»","He does not start from an idea and look for a way to realise it: possible solutions are eliminated until the one left is necessarily the right one. “The negation of creative possibilities is what creates the type, the form and the design of a piece.”"], "LEHMANN pp. 172-183 · MICHEL pp. 10-12"],
-    [["Entziehung","Entziehung"], ["«Retirada», término tomado de Thomas Bernhard. Nombra a la vez un método material —alejarse de la codificación y la tipología— y una posición política: aislamiento y alienación convertidos en concepto estético.","“Withdrawal”, a term taken from Thomas Bernhard. It names both a material method — moving away from codification and typology — and a political position: isolation and alienation turned into an aesthetic concept."], "LEHMANN pp. 179-182"],
-    [["Fuera del mercado","Outside the market"], ["«Produzco cuestionando el sistema capitalista.» No opera fuera del capitalismo: lo atraviesa de otro modo. Sin publicidad, patrocinios, celebrities, préstamos ni calendario.","“I produce by questioning the capitalist system.” He does not operate outside capitalism: he passes through it differently. No advertising, sponsorship, celebrities, loans or calendar."], "LEHMANN p. 180 · OAC"],
-    [["Autodefinición","Self-definition"], ["«Ricercatore», investigador. Trabaja «desde el inconsciente más profundo», sin concepto estético previo: «la estética es el resultado de la exploración inquisitiva».","“Ricercatore”, researcher. He works “from the deepest unconscious”, with no prior aesthetic concept: “aesthetics is the result of inquisitive exploration”."], "FASHIONNOW2 p. 139 · POELLINFO lám. 03/10"]
-  ]},
-  { k: "sub", tx: ["El taller", "The workshop"] },
-  { k: "entries", rows: [
-    [["El espacio","The space"], ["Segunda planta de una nave del sur de Milán, ocupada diecisiete años; antiguo taller de escenografía de la Ópera. Los raíles del techo cuelgan hoy muestras y el archivo de patrones de papel.","The second floor of a warehouse in southern Milan, occupied for seventeen years; formerly the Opera's set-building workshop. The ceiling rails now hang samples and the paper-pattern archive."], "LEHMANN pp. 175-178"],
-    [["La diferencia","The difference"], ["Un atelier de alta costura sabe montar una prenda pero compra sus materiales. C.C.P. los produce: hilos, hilaturas, tejido, tintura y curtido, además del corte y la confección.","A couture atelier knows how to assemble a garment but buys its materials. C.C.P. produces them: threads, yarns, fabric, dyeing and tanning, as well as cutting and making."], "LEHMANN p. 176"],
-    [["Bonotto","Bonotto"], ["El tejedor de Molvena que produce buena parte de sus tejidos, en una fabbrica lenta con telares antiguos manipulables. Para Poell, el acabado —no el tejido— aporta el 60-70 % del carácter del material.","The weaver in Molvena who produces much of his cloth, in a slow factory with old, manipulable looms. For Poell the finishing — not the weaving — accounts for 60-70 % of a material's character."], "LEHMANN, cap. “Primary Material”"]
-  ]},
-  { k: "sub", tx: ["Los procesos invertidos", "The inverted processes"] },
-  { k: "p", tx: [
-    "La firma técnica de la casa: la industria trata el material y luego construye; CCP construye primero y trata después. De aquí se derivan casi todas las demás técnicas.",
-    "The house's technical signature: industry treats the material and then builds; CCP builds first and treats afterwards. Almost every other technique derives from this."
-  ]},
-  { k: "table", head: [["Proceso","Process"], ["Qué invierte","What it inverts"], ["Consecuencia","Consequence"]], rows: [
-    [["Object dyeing · tintura in capo","Object dyeing · tintura in capo"], ["La prenda entera —costuras, forros, herrajes— se tiñe después de construida, en bombo.","The whole garment — seams, linings, hardware — is dyed after being built, in a drum."], ["Tono y encogimiento imprevisibles; secado y pulido a mano. Cada pieza sale distinta.","Unpredictable tone and shrinkage; drying and polishing by hand. Every piece comes out different."]],
-    [["Object tanning · concia in capo","Object tanning · concia in capo"], ["La prenda se cose con la piel cruda y se curte y tiñe entera al final.","The garment is sewn from raw hide and then tanned and dyed whole at the end."], ["Patrón calculado con 10-15 % de exceso. Se cose con guantes de cota de malla. El curtido integra la costura en el cuero.","The pattern is cut with 10-15 % excess. Sewn wearing chainmail gloves. Tanning integrates the seam into the leather."]],
-    [["Object tempering","Object tempering"], ["Membrana fina de canguro entre paneles de cuero de caballo.","A thin kangaroo membrane between horse-leather panels."], ["Crea articulaciones: más movilidad sin forzar el material.","Creates articulations: more movement without forcing the material."]]
-  ]},
-  { k: "note", ref: "LEHMANN pp. 177-190", tx: [
-    "El proceso completo del «Tanned Coat» —los colchones empapados para que la piel no se momifique, los frigoríficos nocturnos, el 50-60 % de muestras perdidas— y el de las botas protésicas, en LEHMANN.",
-    "The full process of the “Tanned Coat” — the soaked mattresses that keep the hide from mummifying, the overnight refrigeration, the 50-60 % of samples lost — and that of the prosthetic boots, in LEHMANN."
-  ]}
-]},
-
-/* ------------------------------------------------ 4 */
-{ id: "tecnica", n: "04", t: ["Técnica", "Technique"], blocks: [
-  { k: "sub", tx: ["Sastrería", "Tailoring"] },
-  { k: "p", tx: [
-    "Las costuras son el núcleo del sistema: en cualquier prenda unen, articulan y garantizan la integridad —fuertes para durar, débiles para ceder ante una tensión inesperada—. Poell exagera las dos funciones.",
-    "Seams are the core of the system: in any garment they join, articulate and guarantee integrity — strong enough to last, weak enough to give under unexpected tension. Poell exaggerates both functions."
-  ]},
-  { k: "table", head: [["Costura","Seam"], ["Qué es","What it is"], ["Efecto","Effect"]], rows: [
-    [["Taped-seam","Taped-seam"], ["Reforzada con cinta transparente termosellada.","Reinforced with heat-sealed transparent tape."], ["Exhibe la costura que el forro escondía; sin forro desde 2003, doblemente visible.","Exhibits the seam the lining used to hide; unlined since 2003, doubly visible."]],
-    [["Meltlock-seam","Meltlock-seam"], ["La costura se sobrefunde con cinta más gruesa.","The seam is over-fused with thicker tape."], ["Refuerza el interior del overlock y lo vuelve rígido.","Reinforces the inside of the overlock and stiffens it."]],
-    [["Scar-stitch","Scar-stitch"], ["Sobrehilado con aspecto de cicatriz.","An overcast stitch that looks like a scar."], ["Cosido por dentro, visible por fuera. Punto apretado, rígido.","Sewn from within, visible from without. Tight, rigid stitch."]],
-    [["Overlock-seam","Overlock-seam"], ["Hilo grueso, puntos separados.","Thick thread, widely spaced stitches."], ["El rasgo más reconocible de la casa.","The house's most recognisable feature."]],
-    [["Invisible-seam","Invisible-seam"], ["Hilo de nailon translúcido y flexible.","Translucent, flexible nylon thread."], ["Sin tensión cierra; con tensión abre sin romperse y revela la carne.","Under no tension it closes; under tension it opens without breaking and reveals the flesh."]],
-    [["Chain-seam","Chain-seam"], ["Hilo rígido, punto de cadeneta.","Rigid thread, chain stitch."], ["Deja la costura permanentemente abierta.","Leaves the seam permanently open."]]
-  ]},
-  { k: "entries", rows: [
-    [["El sistema","The system"], ["Las costuras agotan las cuatro combinaciones de continuo/discontinuo y rígido/flexible. La invisible ocupa dos casillas a la vez. Y el cambio decisivo es topológico: la invisible y la chain no están ni dentro ni fuera, están en medio.","The seams exhaust the four combinations of continuous/discontinuous and rigid/flexible. The invisible one occupies two cells at once. And the decisive shift is topological: the invisible and the chain seam are neither inside nor outside, they are in between."], "MICHEL pp. 8-12"],
-    [["El significado","The meaning"], ["La cicatriz es la huella de una herida cuyos bordes se reunieron: prueba de que la curación prevaleció. Coser es luchar contra la muerte, la discontinuidad fundamental. Es el tema central de la obra.","The scar is the trace of a wound whose edges came back together: proof that healing prevailed. To sew is to fight against death, the fundamental discontinuity. This is the central theme of the work."], "MICHEL pp. 12-15"],
-    [["Self-Edge","Self-Edge"], ["El orillo —borde autoacabado del tejido— usado en curvas y no sólo en rectas, lo que exige el doble o el cuádruple de metros. Las prendas quedan tan rígidas que se sostienen solas de pie.","The selvedge — the fabric's self-finished edge — used on curves and not only on straight lines, which demands two to four times the yardage. The garments end up so rigid they stand up on their own."], "POELLINFO c. 16 · c. 17", "archivo/poellinfo/16-self-edge.jpg"],
-    [["Dead-End","Dead-End"], ["El opuesto: la ropa nunca llega a juntarse. Piezas unidas con cinta o cadeneta, con aspecto de estar desgarrándose. La emblemática es la prenda «one piece» de doble cicatriz asimétrica: es porque se mantiene la discontinuidad entre las dos cicatrices que la prenda resulta continua.","The opposite: the clothing never quite comes together. Pieces joined with tape or chain stitch, looking as if they were tearing. The emblematic one is the “one piece” garment with an asymmetric double scar: it is because the discontinuity between the two scars is maintained that the garment turns out continuous."], "MICHEL pp. 14-15"],
-    [["Tornado / Spiral","Tornado / Spiral"], ["Pantalones cuyo giro se consigue por patrón y construcción —un cordón en espiral incorporado—, no por una segunda capa. De los «Bandage Strap Pants» de AW 00-01 a los Full y Half Spiral de 2009-2010.","Trousers whose twist is achieved through pattern and construction — an incorporated spiral cord — not through a second layer. From the AW 00-01 “Bandage Strap Pants” to the Full and Half Spiral of 2009-2010."], "POELLINFO c. 26", "archivo/poellinfo/26-tornado-pants.jpg"],
-    [["Perforación","Perforation"], ["Dos técnicas: corte láser (SS 02, hecho después de construir la prenda, lo que deja bordes inseguros) y punzonado. El cuero perforado tuvo una única temporada, SS 08 —con las suelas también perforadas—.","Two techniques: laser cutting (SS 02, done after the garment is built, which leaves unstable edges) and punching. Perforated leather had a single season, SS 08 — with the soles perforated too."], "POELLINFO c. 15 · c. 14", "archivo/poellinfo/14-perforated-leather.jpg"],
-    [["Silueta","Silhouette"], ["Sisas estrechas que fuerzan una postura erguida —«sastrería ortopédica»—, hombro híbrido (sastre delante, raglán detrás), ausencia de forro, asimetría. Giro tardío hacia el volumen en las piezas recientes.","Narrow armholes that force an upright posture — “orthopaedic tailoring” — a hybrid shoulder (tailored in front, raglan behind), no lining, asymmetry. A late turn towards volume in the recent pieces."], "MICHEL p. 1 · POELLINFO c. 22"]
-  ]},
-  { k: "sub", tx: ["Tejido", "Fabric"] },
-  { k: "p", tx: [
-    "Desarrolla el 90 % de los tejidos que usa desde el primer paso de su producción.",
-    "He develops 90 % of the fabrics he uses from the first step of their production."
-  ]},
-  { k: "table", head: [["Tejido","Fabric"], ["Composición","Composition"], ["Comportamiento","Behaviour"]], rows: [
-    [["SURFACE","SURFACE"], ["80 % lana · 20 % ramio","80 % wool · 20 % ramie"], ["Grueso, seco, áspero. Sostiene cantos rígidos y cuellos que no se arrugan.","Thick, dry, coarse. Holds rigid edges and collars that do not crease."]],
-    [["KOAT","KOAT"], ["100 % algodón","100 % cotton"], ["Mismo peso, tacto suave. Sólo negro y blanco.","Same weight, soft hand. Black and white only."]],
-    [["ACA-EDGE","ACA-EDGE"], ["100 % lana virgen","100 % virgin wool"], ["Ligero y muy seco; el cuello queda más blando. El más caro de la familia -EDGE.","Light and very dry; the collar stays softer. The most expensive of the -EDGE family."]],
-    [["PEDGE","PEDGE"], ["100 % algodón","100 % cotton"], ["Muy tupido. Blazers y vest bags, con la línea roja del orillo a la vista.","Very dense. Blazers and vest bags, with the selvedge's red line on show."]],
-    [["CO-EDGE / CON-EDGE","CO-EDGE / CON-EDGE"], ["100 % algodón","100 % cotton"], ["Transpirable, estructurado y crujiente. CON-EDGE, para trajes.","Breathable, structured and crisp. CON-EDGE for suiting."]],
-    [["ROR-EDGE / RAR-EDGE","ROR-EDGE / RAR-EDGE"], ["55 ramio + 45 lana / 100 ramio","55 ramie + 45 wool / 100 ramie"], ["Envejece como un denim crudo: marca pliegues y destiñe alrededor.","Ages like raw denim: it creases and bleeds around the folds."]],
-    [["KITE-S","KITE-S"], ["Poliéster termosellado","Heat-sealed polyester"], ["Forro-cáscara de SS 08. Da nombre a las prendas -chute.","The shell-lining of SS 08. It gives the -chute garments their name."]],
-    [["DIAGON · LOCH · HAIR · ELEFANT","DIAGON · LOCH · HAIR · ELEFANT"], ["—","—"], ["De Instant Collection. HAIR es cuero con el pelo intacto.","From Instant Collection. HAIR is leather with the hair left on."]]
-  ]},
-  { k: "sub", tx: ["Cuero · leer una etiqueta", "Leather · reading a label"] },
-  { k: "label", code: "LM/2498 CORS-PTC/12", parts: [
-    ["LM/2498", ["modelo","model"]],
-    ["CORS", ["cuero de caballo","horse leather"]],
-    ["-PTC", ["pronto per tintura in capo · listo para teñir en prenda","pronto per tintura in capo · ready for garment dyeing"]],
-    ["/12", ["color verde oscuro 12","colour 12, dark green"]]
-  ], tail: [
-    "El sufijo -PCC (concia in capo) significa, en cambio, listo para curtir en prenda.",
-    "The suffix -PCC (concia in capo) means, instead, ready for garment tanning."
-  ]},
-  { k: "table", head: [["Código","Code"], ["Especie","Species"], ["Código","Code"], ["Especie","Species"]], rows: [
-    [["BIAS · BIUS · BUUS","BIAS · BIUS · BUUS"], ["Bisonte: fino · grueso · troquelado","Bison: fine · thick · embossed"], ["ROOLS · ROOMS · RUUMS","ROOLS · ROOMS · RUUMS"], ["Canguro: 0,4-0,5 mm · 0,8-0,9 mm · troquelado","Kangaroo: 0.4-0.5 mm · 0.8-0.9 mm · embossed"]],
-    [["CORS · CORSS","CORS · CORSS"], ["Caballo, parte delantera: normal · grueso","Horse, front section: normal · thick"], ["PACAL","PACAL"], ["Ternera con polietileno que produce desgarros únicos","Calf with polyethylene, producing unique tears"]],
-    [["CUBS · CUL","CUBS · CUL"], ["Cordobán por el revés: wet white · vegetal","Shell cordovan, flesh side: wet white · vegetable"], ["SBUC · LUC","SBUC · LUC"], ["Cordobán por la flor: wet white · vegetal","Shell cordovan, grain side: wet white · vegetable"]]
-  ]},
-  { k: "entries", rows: [
-    [["Wet white","Wet white"], ["Curtido sin cromo (glutaraldehído, sintanos, taninos o sales de aluminio y circonio). Queda claro, lo que lo hace apto para recibir después cualquier tono: justo lo que exige el object dyeing. Se opone al wet blue, el curtido al cromo estándar de la industria, que CCP no usa.","Chrome-free tanning (glutaraldehyde, syntans, tannins or aluminium and zirconium salts). It stays pale, which makes it able to take any tone afterwards: exactly what object dyeing requires. It stands against wet blue, the industry-standard chrome tanning, which CCP does not use."], "LAZZARI"],
-    [["Curtido vegetal","Vegetable tanning"], ["Con taninos. Más lento y rígido; desarrolla pátina y oscurece. En CCP se reserva a los colores muy oscuros (10 negro, 12 verde oscuro).","With tannins. Slower and stiffer; it develops a patina and darkens. At CCP it is reserved for the very dark colours (10 black, 12 dark green)."], "LAZZARI"],
-    [["Cordobán","Shell cordovan"], ["Piel equina de la grupa, de Córdoba. Admite mal el tinte, se tiñe a mano por dentro, se engrasa a los diez días y se pule con rodillo de cristal o ágata. Seis meses de proceso.","Equine hide from the rump, from Córdoba. It takes dye poorly, is hand-dyed from the inside, oiled after ten days and polished with a glass or agate roller. A six-month process."], "LAZZARI"]
-  ]},
-  { k: "colors", tx: ["Los colores", "The colours"], note: [
-    "Cada código es una fórmula de tintura, no un tono nominal: 10 es el negro para tejido y 010 el negro para cuero.",
-    "Each code is a dye formula, not a nominal shade: 10 is black for fabric and 010 black for leather."
-  ], rows: [
-    ["01", "#f4f4f2", ["blanco brillante","bright white"]],
-    ["03", "#e8ded9", ["blanco natural / rosa pálido","natural white / pale pink"]],
-    ["06", "#9aa87f", ["verde claro","light green"]],
-    ["10", "#101010", ["negro (010 · 1010)","black (010 · 1010)"]],
-    ["12", "#1e2a21", ["verde oscuro","dark green"]],
-    ["13", "#8c1c17", ["rojo","red"]],
-    ["14A", "#c2521a", ["naranja","orange"]],
-    ["15", "#3d1526", ["rojo violeta oscuro","dark violet red"]],
-    ["16", "#2a2f7a", ["azul eléctrico / púrpura","electric blue / purple"]],
-    ["19", "#3a3c3b", ["gris oscuro","dark grey"]],
-    ["29", "#101726", ["azul extremadamente oscuro","extremely dark blue"]],
-    ["33", "#b6b7b2", ["gris claro","light grey"]],
-    ["35", "#c9b23a", ["amarillo","yellow"]]
-  ]},
-  { k: "sub", tx: ["Cueros extremos", "Extreme leathers"] },
-  { k: "entries", rows: [
-    [["Transparente","Transparent"], ["Se retira el pigmento hasta hacer la piel translúcida, por un método arcaico y sin precedentes; presentado en 2000. No era estable: una pieza actual estaría en descomposición.","The pigment is withdrawn until the hide becomes translucent, by an archaic and unprecedented method; presented in 2000. It was not stable: a piece today would be decomposing."], "POELLINFO c. 5", "archivo/poellinfo/5-transparent-leather.jpg"],
-    [["Teñido en sangre","Blood-dyed"], ["El interior del cuero untado con sangre animal, «para devolverle la vida»: la química de la sangre cambia de tono con el tiempo.","The inside of the leather smeared with animal blood, “to give it back its life”: the chemistry of the blood shifts tone over time."], "GRAILED · LPA"],
-    [["Tinte inyectado","Injected dye"], ["Pintura inyectada a través de las venas de la piel, para que las vías de la sangre queden visibles. No confundir con el bulo del animal vivo.","Paint injected through the hide's veins, so that the blood's channels stay visible. Not to be confused with the live-animal hoax."], "POELLINFO c. 27", "archivo/poellinfo/27-injected-dye.jpg"],
-    [["Calzado","Footwear"], ["Drip: caucho líquido que solidifica en estalactitas; sella la suela y está hecho para desgastarse —hacia el quinto uso el zapato es normal—. U-sole: suela que se envuelve sobre sí misma creando una cámara de aire.","Drip: liquid rubber that solidifies into stalactites; it seals the sole and is made to wear away — by about the fifth wear the shoe is normal. U-sole: a sole that wraps over itself, creating an air chamber."], "POELLINFO c. 32 · c. 30", "archivo/poellinfo/32-drip-rubber.jpg"]
-  ]},
-  { k: "sub", tx: ["Agregados", "Add-ons"] },
-  { k: "entries", rows: [
-    [["Prótesis craneofaciales","Craniofacial prostheses"], ["Dientes, ojos, lengua, cabello. Una prótesis real imita su equivalente natural para disimular una malformación; Poell abandona esa función y las expone como joyería, separadas del cuerpo.","Teeth, eyes, tongue, hair. A real prosthesis imitates its natural equivalent to disguise a malformation; Poell abandons that function and displays them as jewellery, separated from the body."], "POELLINFO c. 9", "archivo/poellinfo/9-prosthetic-eyes.jpg"],
-    [["Prótesis de titanio","Titanium prostheses"], ["En dedos, codos, tobillos, rodillas, talones y puntas. Las fabrica un taller de Vicenza que normalmente hace punteras de seguridad. No restringen el cuerpo: demuestran la otredad de la prenda.","On fingers, elbows, ankles, knees, heels and toes. Made by a workshop in Vicenza that normally produces safety toecaps. They do not restrict the body: they demonstrate the garment's otherness."], "POELLINFO c. 10 · LEHMANN p. 177", "archivo/poellinfo/10-prosthetic-gloves.jpg"],
-    [["Metal","Metal"], ["Titanio en codos y nudillos; cota de malla; sujetador metálico. La cadena del puño americano recorre toda la obra: puño de bronce → anillo de cuatro eslabones → prótesis de nudillo.","Titanium on elbows and knuckles; chainmail; metal bra. The knuckleduster's chain runs through the whole body of work: bronze knuckleduster → four-link ring → knuckle prosthesis."], "KITCHELL"],
-    [["Accesorios","Accessories"], ["Kitchell los ordena en cinco categorías, de menos a más dramatizados: utilidad banal (imperdible, bolígrafo, portapapeles) · restricción (guantes que fusionan dedos, molde que bloquea el codo) · disfraz irónico (nariz de payaso, gorguera isabelina) · violencia (puño americano, collar de 2 kg) · sacrificio (pata de animal, boa de intestino).","Kitchell sorts them into five categories, from least to most dramatised: banal utility (safety pin, pen, clipboard) · restriction (gloves that fuse fingers, a cast that locks the elbow) · ironic disguise (clown nose, Elizabethan ruff) · violence (knuckleduster, 2 kg collar) · sacrifice (animal leg, intestine boa)."], "KITCHELL"],
-    [["Bolsos","Bags"], ["La Multi-dimensional Bag reproduce el marco de precintado de las bolsas soviéticas de transporte de dinero de 1961, en cuero de caballo sumergido en caucho. El AM/2573 vest bag parte de un chaleco salvavidas del ejército estadounidense de 1967.","The Multi-dimensional Bag reproduces the sealing frame of Soviet 1961 money-transport bags, in horse leather dipped in rubber. The AM/2573 vest bag starts from a 1967 US Army life vest."], "POELLINFO c. 19 · c. 1", "archivo/poellinfo/19-bag.jpg"],
-    [["Materiales límite","Limit materials"], ["Fibra de vidrio: abrigo de 2009 que exigía guantes, mascarilla y gafas para coserlo y que no puede llevarse; aun así se vendieron dos. DARM: intestino de cerdo convertido en punto. Cabello humano: comprado en la feria de fabricantes de pelucas.","Fibreglass: a 2009 coat that required gloves, mask and goggles to sew and that cannot be worn; two were sold anyway. DARM: pig intestine turned into knit. Human hair: bought at the wigmakers' fair."], "LEHMANN pp. 184-186 · POELLINFO c. 20 · MICHEL p. 16"]
-  ]}
-]},
-
-/* ------------------------------------------------ 5 */
-{ id: "estetica", n: "05", t: ["Estética, temas e influencias", "Aesthetics, themes and influences"], blocks: [
-  { k: "sub", tx: ["Temas", "Themes"] },
-  { k: "entries", rows: [
-    [["Vida y muerte","Life and death"], ["El tema matriz. Lo vegetal frente a lo animal, tejer —crear tejido nuevo— frente a curtir —eternizar una piel muerta—. No es una obra macabra sino una tensión heraclítea irresuelta.","The matrix theme. The vegetal against the animal, weaving — creating new tissue — against tanning — making a dead skin eternal. This is not macabre work but an unresolved Heraclitean tension."], "MICHEL pp. 12-15"],
-    [["La herida","The wound"], ["Perforado, tejidos que se disuelven y aberturas frente a las adiciones protésicas. Pero los signos sólo cuentan cuando se ponen en juego llevando la ropa: la moda como herida, transgresión y apertura a la vez.","Perforation, dissolving fabrics and openings against prosthetic additions. But the signs only count when they are put at stake by wearing the clothes: fashion as wound, transgression and opening at once."], "POELLINFO c. 35"],
-    [["Soberanía animal","Animal sovereignty"], ["Usa subproductos de animales consumidos como alimento, no pieles exóticas. Three Refrigerated Cells se niega a mantener la distancia entre origen y resultado: «lo oculto permite explotar; ser honrado es recuperar presencia».","He uses by-products of animals eaten as food, not exotic skins. Three Refrigerated Cells refuses to keep the distance between origin and result: “what is hidden permits exploitation; to be honest is to recover presence”."], "POELLINFO c. 18 · MICHEL p. 21"],
-    [["Exoesqueleto","Exoskeleton"], ["Disjointed funde lo artrópodo y lo medieval: capucha que es bacinete o isópodo, parka con cola, hebillas como vértebras. La prenda permite convertirse en monstruo y hallar seguridad en la otredad.","Disjointed fuses the arthropod and the medieval: a hood that is a bascinet or an isopod, a parka with a tail, buckles like vertebrae. The garment lets you become a monster and find safety in otherness."], "POELLINFO c. 29"],
-    [["Valor ganado","Earned value"], ["La comodidad no se da, se gana: la ropa necesita uso para adaptarse. Resistencia al «alisamiento» de la cultura tardomoderna, emparentada con el wabi-sabi.","Comfort is not given, it is earned: the clothing needs wear in order to adapt. A resistance to the “smoothing” of late-modern culture, akin to wabi-sabi."], "OAC"],
-    [["Paradoja","Paradox"], ["Los opuestos coexisten en la misma prenda: piel y armadura, rígido y flexible, fascinación y repulsión. La incomodidad no es consecuencia de su investigación: es su base.","Opposites coexist in the same garment: skin and armour, rigid and flexible, fascination and repulsion. Discomfort is not a consequence of his research: it is its basis."], "MICHEL pp. 21-23"],
-    [["Abyección","Abjection"], ["El collar de dientes y el anillo de ojo representan partes del cuerpo que entendemos como separables. Objetos abyectos en el sentido de Kristeva: lo que se expulsa por amenazar el orden.","The teeth collar and the eye ring stand for parts of the body we understand as detachable. Abject objects in Kristeva's sense: what is expelled because it threatens order."], "KITCHELL"]
-  ]},
-  { k: "sub", tx: ["Influencias", "Influences"] },
-  { k: "entries", rows: [
-    [["Accionismo vienés","Viennese Actionism"], ["La referencia mayor, confirmada por Poell. Cita directa (el círculo de látex rojo de Nitsch), homenaje (la navaja de afeitar de Brus y Schwarzkogler como colgante) y reescritura: al Einmauerung de 1962, en que los accionistas se emparedaron, responde Traditional Escape, en que los modelos escapan.","The major reference, confirmed by Poell. Direct quotation (Nitsch's red latex circle), homage (Brus and Schwarzkogler's razor as a pendant) and rewriting: to the 1962 Einmauerung, in which the actionists walled themselves in, Traditional Escape replies, with the models escaping."], "MICHEL pp. 16-21"],
-    [["Nazismo y memoria","Nazism and memory"], ["Michel rastrea el cabello humano, el talle pinzado próximo al uniforme y el bisonte de 2010 como huellas de una pregunta por la creación después de Auschwitz. Su conclusión no es acusatoria sino elegíaca: Poell crea prendas que visten el duelo.","Michel traces the human hair, the nipped waist close to a uniform and the 2010 bison as traces of a question about creation after Auschwitz. His conclusion is not accusatory but elegiac: Poell makes garments that dress mourning."], "MICHEL pp. 16-18, 20-21"],
-    [["Kafka y Bernhard","Kafka and Bernhard"], ["Kafka, por el rechazo de la metáfora y la indecisión genérica. Bernhard, por el Entziehung y el lenguaje reducido.","Kafka, for the refusal of metaphor and generic undecidability. Bernhard, for the Entziehung and the reduced language."], "MICHEL p. 22 · LEHMANN p. 179"],
-    [["Arte Povera y teoría del lujo","Arte Povera and luxury theory"], ["Donde el Arte Povera usaba carbón o acero, Poell usa realidad biológica y materiales industriales difíciles. Leído contra Baudrillard: al exponer las venas y usar sangre, reintroduce lo Real y el objeto deja de ser simulacro.","Where Arte Povera used coal or steel, Poell uses biological reality and difficult industrial materials. Read against Baudrillard: by exposing the veins and using blood, he reintroduces the Real and the object stops being a simulacrum."], "OAC"],
-    [["Marx y Hegel","Marx and Hegel"], ["Prioridad de la infraestructura sobre la superestructura: el material y su fabricación preceden a la forma. Y el Aufheben hegeliano para explicar cómo las últimas costuras superan a las anteriores.","The priority of infrastructure over superstructure: the material and its manufacture precede the form. And the Hegelian Aufheben to explain how the later seams sublate the earlier ones."], "MICHEL pp. 9-10"],
-    [["Referencialidad","Referentiality"], ["Parafernalia médica y militar del siglo XX: chaleco salvavidas de 1967, bolsa soviética de 1961, imperdibles de lavandería de la 2.ª Guerra, delantal de artesano, costuras divergentes de la militaria vintage.","Twentieth-century medical and military paraphernalia: a 1967 life vest, a 1961 Soviet bag, WWII laundry pins, a craftsman's apron, the divergent seams of vintage militaria."], "POELLINFO c. 1"]
-  ]}
-]},
-
-/* ------------------------------------------------ 6 */
-{ id: "obra", n: "06", t: ["Obra y contexto", "Work and context"], blocks: [
-  { k: "sub", tx: ["Presentaciones", "Presentations"] },
-  { k: "entries", rows: [
-    [["Three Refrigerated Cells · 28.06.2000","Three Refrigerated Cells · 28.06.2000"], ["Tres cámaras de un matadero: la colección · los animales desollados en gasa · una silla frente a un espejo. «¿Puedes con esto? ¿Cómo lo llevas?» Iba dirigida a compradores y prensa, no al público.","Three chambers of a slaughterhouse: the collection · the flayed animals in gauze · a chair facing a mirror. “Can you take this? How do you deal with it?” It was aimed at buyers and press, not at the public."], ""],
-    [["Public Freedom · 17.01.2001","Public Freedom · 17.01.2001"], ["En una perrera, con siete minutos de ladridos en bucle. «Me pregunté cuál es la diferencia entre nosotros y la gente que está en la cárcel.»","In a dog pound, with seven minutes of barking on loop. “I asked myself what the difference is between us and people who are in prison.”"], ""],
-    [["Traditional Escape · SS 02","Traditional Escape · SS 02"], ["Modelos con los ojos vendados descolgándose por la ventana del estudio con sábanas anudadas. Las prendas hacen lo mismo: la piel «escapa» a través del láser, la malla y el cuero transparente.","Blindfolded models abseiling out of the studio window on knotted sheets. The garments do the same: the skin “escapes” through the laser, the mesh and the transparent leather."], ""],
-    [["Mainstream-Downstream · SS 04","Mainstream-Downstream · SS 04"], ["17 modelos «muertos» flotando por el Naviglio Grande con ropa que se arruinaba al sumergirse. Sin pasarela ni asientos: cualquier transeúnte podía mirar. Su última presentación crítica.","17 “dead” models floating down the Naviglio Grande in clothes that were ruined by submersion. No runway, no seats: any passer-by could watch. His last critical presentation."], ""],
-    [["Selfsame · 2009","Selfsame · 2009"], ["Fábrica ruinosa, ropa colgada de ganchos de carnicero y un círculo de látex rojo en el suelo.","A ruined factory, clothes hung from butcher's hooks and a red latex circle on the floor."], ""],
-    [["Squartter · 14.04.2010","Squartter · 14.04.2010"], ["Un caballo desollado y curtido en una sola pieza, cosido con el scar-stitch de la casa. Vendido, con ironía, como sofá.","A horse flayed and tanned in a single piece, sewn with the house's scar-stitch. Sold, with irony, as a sofa."], ""]
-  ]},
-  { k: "note", ref: "POELLINFO c. 6 · 15 · 18 · 7", tx: [
-    "Cada presentación está descrita en detalle, con citas de época, en POELLINFO. Casi todas están filmadas.",
-    "Each presentation is described in detail, with period quotes, in POELLINFO. Almost all of them were filmed."
-  ]},
-  { k: "sub", tx: ["Mercado", "Market"] },
-  { k: "entries", rows: [
-    [["Escasez real","Real scarcity"], ["Los minoristas reciben a menudo un cuarto de lo que piden y hay dos años de lista de espera por cliente. No nace de una estrategia de demanda artificial sino de límites materiales: el proceso es lento y autolimitado.","Retailers often receive a quarter of what they order and there is a two-year waiting list per client. It does not come from a strategy of artificial demand but from material limits: the process is slow and self-limiting."], "LEHMANN pp. 180-181"],
-    [["El corte de 2010","The 2010 cut-off"], ["Da el diseño por terminado. La facturación sube cada año pese a limitar la producción. Cualquier serie nueva llevaría fecha «2011».","He declares the design finished. Turnover rises every year despite limiting production. Any new series would be dated “2011”."], "LEHMANN p. 181"],
-    [["Influencia y copia","Influence and copying"], ["Marcas mayores adaptan y simplifican sus hallazgos, a menudo con los mismos fabricantes. Rige la «ley de la visibilidad»: la marca más visible retiene la reclamación de originalidad. El drip ha sido replicado por varias firmas eliminando justo lo que lo definía, la incomodidad inicial.","Bigger brands adapt and simplify his findings, often with the same manufacturers. The “law of visibility” rules: the most visible brand keeps the claim to originality. The drip has been replicated by several labels, removing exactly what defined it — the initial discomfort."], "LEHMANN p. 176 · OAC"],
-    [["Su lugar","His place"], ["En 2001 el catálogo Landed–Geland ya lo contaba entre Margiela, Raf Simons, Chalayan, Comme des Garçons y Viktor & Rolf. Fashion Now 2 lo llama «una anomalía» en un Milán orgulloso del matrimonio entre comercio y creatividad.","By 2001 the Landed–Geland catalogue already counted him among Margiela, Raf Simons, Chalayan, Comme des Garçons and Viktor & Rolf. Fashion Now 2 calls him “an anomaly” in a Milan proud of the marriage between commerce and creativity."], "LANDED p. 30 · FASHIONNOW2 p. 138"]
-  ]}
-]},
-
-/* ------------------------------------------------ 7 */
-{ id: "precisiones", n: "07", t: ["Precisiones", "Corrections"], blocks: [
-  { k: "p", tx: [
-    "Cuatro puntos donde las fuentes se contradicen o donde circula información falsa. Conviene tenerlos presentes antes de citar cualquier dato.",
-    "Four points where the sources contradict each other or where false information circulates. Worth keeping in mind before citing anything."
-  ]},
-  { k: "entries", rows: [
-    [["El animal vivo","The live animal"], ["Falso. El bulo sobre la chaqueta de FW 98-99 nace de un anuncio de subasta japonés que hablaba de tinta inyectada en una piel antes del curtido. La veteadura es un defecto reconocido del cuero curtido al cromo, usable con fines artísticos.","False. The hoax about the FW 98-99 jacket comes from a Japanese auction listing that mentioned ink injected into a hide before tanning. The marbling is a recognised defect of chrome-tanned leather, usable for artistic ends."], "POELLINFO c. 27"],
-    [["La incomodidad","The discomfort"], ["Matizada por el propio estudio, que ha refinado patrones para adecuarlos a la comodidad precisamente para disipar el mito. La comodidad es diferida, no negada.","Qualified by the studio itself, which has refined patterns for comfort precisely in order to dispel the myth. Comfort is deferred, not denied."], "POELLINFO c. 3"],
-    [["Fechas en conflicto","Conflicting dates"], ["Primera colección: FW 94-95 o 1995 según la fuente —se reconcilia distinguiendo producción de presentación pública—. Primera FE-MALE: 1998 o 1999. Squartter: el texto dice 2010, la invitación reproducida dice 2011.","First collection: FW 94-95 or 1995 depending on the source — reconciled by distinguishing production from public presentation. First FE-MALE: 1998 or 1999. Squartter: the text says 2010, the reproduced invitation says 2011."], "POELLINFO · MICHEL p. 1"],
-    [["La boa de intestino","The intestine boa"], ["Kitchell la atribuye primero a la anguila y luego al cerdo. Prevalece POELLINFO, que consultó directamente al estudio: es intestino de cerdo, material que internamente se llama DARM.","Kitchell first attributes it to eel and then to pig. POELLINFO prevails, having consulted the studio directly: it is pig intestine, internally called DARM."], "POELLINFO c. 20"]
-  ]}
-]},
-
-/* ------------------------------------------------ 8 */
-{ id: "biblio", n: "08", t: ["Bibliografía", "Bibliography"], blocks: [
-  { k: "sources", rows: [
-    ["MICHEL", ["Michel, Christian. Thought Without Concept: Carol Christian Poell's Paradoxical Aesthetics. En Philosophical Perspectives on Fashion. Londres: Bloomsbury Academic, 2016, pp. 119-135.","Michel, Christian. Thought Without Concept: Carol Christian Poell's Paradoxical Aesthetics. In Philosophical Perspectives on Fashion. London: Bloomsbury Academic, 2016, pp. 119-135."], ["La fuente teórica central: sistema de costuras, continuidad y discontinuidad, Accionismo vienés, nazismo y memoria.","The central theoretical source: the seam system, continuity and discontinuity, Viennese Actionism, Nazism and memory."]],
-    ["LEHMANN", ["Lehmann, Ulrich. Fashion and Materialism. Edimburgo: Edinburgh University Press. Caps. «Dialetics in C.C.P.» y «Primary Material».","Lehmann, Ulrich. Fashion and Materialism. Edinburgh: Edinburgh University Press. Chs. “Dialetics in C.C.P.” and “Primary Material”."], ["La fuente sobre proceso y economía: el taller, el tejedor Bonotto, la negación, el Entziehung y el funcionamiento real de la marca.","The source on process and economy: the workshop, the weaver Bonotto, negation, Entziehung and how the label actually works."]],
-    ["POELLINFO", ["Archivo @poellinfo. 309 imágenes, 4 vídeos y 36 entradas de texto, más una serie de 10 láminas que traduce «Der Mann Ohne Eigenschaften» (Achtung, 2003).","The @poellinfo archive. 309 images, 4 videos and 36 text entries, plus a series of 10 plates translating “Der Mann Ohne Eigenschaften” (Achtung, 2003)."], ["La fuente de dato concreto: colecciones, tejidos, prótesis, accesorios, presentaciones y desmontaje de bulos.","The source for concrete data: collections, fabrics, prostheses, accessories, presentations and the debunking of hoaxes."]],
-    ["KITCHELL", ["Kitchell, M. Accessory, Abjection: On the performative accessoires de mode of Carol Christian Poell. Corpstext, 05.08.2025.","Kitchell, M. Accessory, Abjection: On the performative accessoires de mode of Carol Christian Poell. Corpstext, 05.08.2025."], ["Los accesorios en cinco categorías, leídos desde Kristeva, Bataille y Hebdige.","The accessories in five categories, read through Kristeva, Bataille and Hebdige."]],
-    ["LAZZARI", ["Carol Christian Poell online guide for CCP leather shoes and garments. Lazzari Store, Treviso.","Carol Christian Poell online guide for CCP leather shoes and garments. Lazzari Store, Treviso."], ["El manual de la etiqueta: códigos de cuero, curtidos, cordobán y tabla de colores.","The label manual: leather codes, tannages, cordovan and the colour table."]],
-    ["OAC", ["Banks, Christopher. Carol Christian Poell: The Alchemical Designer. Objects of Affection Collection, Study 044, 09.11.2025.","Banks, Christopher. Carol Christian Poell: The Alchemical Designer. Objects of Affection Collection, Study 044, 09.11.2025."], ["Marco teórico del lujo: Baudrillard, Byung-Chul Han, wabi-sabi, Arte Povera.","A theoretical frame for luxury: Baudrillard, Byung-Chul Han, wabi-sabi, Arte Povera."]],
-    ["GRAILED", ["Park, Gunner. The History of Carol Christian Poell. Grailed, 18.05.2017.","Park, Gunner. The History of Carol Christian Poell. Grailed, 18.05.2017."], ["Panorámica biográfica y narrativa; menos fiable en fechas.","A biographical, narrative overview; less reliable on dates."]],
-    ["NICHE", ["Carol Christian Poell — El nicho de la moda de culto. Ficha de marca en español.","Carol Christian Poell — El nicho de la moda de culto. Spanish brand profile."], ["Con preguntas frecuentes y directorio de tiendas.","With FAQs and a store directory."]],
-    ["LPA", ["Cobos, Gonzalo. #DESIGNERBIO Carol Christian Poell & sus técnicas poco convencionales. Le Petit Archive.","Cobos, Gonzalo. #DESIGNERBIO Carol Christian Poell & sus técnicas poco convencionales. Le Petit Archive."], ["Ficha breve en español centrada en técnicas y piezas singulares.","A short Spanish profile focused on techniques and singular pieces."]],
-    ["FLUX", ["U-Turn, S/S 06 collection by Carol Christian Poell. FLUX nº 54, mayo-junio 2006. Fotografía de Stefan Zeisler.","U-Turn, S/S 06 collection by Carol Christian Poell. FLUX no. 54, May-June 2006. Photography by Stefan Zeisler."], ["Editorial de época con la lista de piezas página a página.","A period editorial with the piece list page by page."]],
-    ["FASHIONNOW2", ["Ross, Marcus. «Carol Christian Poell». En Fashion Now 2. Colonia: Taschen, pp. 138-139.","Ross, Marcus. “Carol Christian Poell”. In Fashion Now 2. Cologne: Taschen, pp. 138-139."], ["Incluye el cuestionario respondido por Poell.","Includes the questionnaire answered by Poell."]],
-    ["LANDED", ["Landed–Geland. Catálogo de la exposición. Amberes, 2001.","Landed–Geland. Exhibition catalogue. Antwerp, 2001."], ["Sitúa a CCP entre sus contemporáneos y documenta un conjunto suyo con «top de vidrio».","Places CCP among his contemporaries and documents an outfit of his with a “glass top”."]],
-    ["(contexto)", ["Moda: historia de los diseños y estilos. Manual general.","Moda: historia de los diseños y estilos. A general manual."], ["No menciona a Poell; se ha usado sólo como marco histórico y vocabulario de sastrería.","It does not mention Poell; used only as historical frame and tailoring vocabulary."]]
-  ]},
-  { k: "sub", tx: ["Videografía", "Videography"] },
-  { k: "entries", rows: [
-    [["Presentaciones filmadas","Filmed presentations"], ["Mainstream — Downstream (SS 04) · Best Before (2000, remaster 2022) · Public Freedom (2001) · Traditional Escape (SS 02) · Off-Scene (SS 08) · Trigger · Crushable Shoes.","Mainstream — Downstream (SS 04) · Best Before (2000, 2022 remaster) · Public Freedom (2001) · Traditional Escape (SS 02) · Off-Scene (SS 08) · Trigger · Crushable Shoes."], ""],
-    [["Documentales y análisis","Documentaries and analysis"], ["Moseer, David — A Conversation (lo más cercano a una entrevista) · Foster, Bliss — The Complete Guide to Mainstream Downstream · Kroening, Karsten — Understanding CCP · wrong trousers · Jasb13r (único en español) · SAMSA G — FE-MALE · Cheng, Polo — Archive collection.","Moseer, David — A Conversation (the closest thing to an interview) · Foster, Bliss — The Complete Guide to Mainstream Downstream · Kroening, Karsten — Understanding CCP · wrong trousers · Jasb13r (the only one in Spanish) · SAMSA G — FE-MALE · Cheng, Polo — Archive collection."], ""],
-    [["Vídeos del archivo","Archive videos"], ["Cuatro clips breves en POELLINFO: prótesis de calzado · el descenso por la ventana de Traditional Escape · una cigarra emergiendo de su exuvia (ilustra el forro KITE-S como muda) · la gorguera isabelina.","Four short clips in POELLINFO: footwear prostheses · the window descent of Traditional Escape · a cicada emerging from its exuvia (illustrating the KITE-S lining as a moult) · the Elizabethan ruff."], ""]
-  ]},
-  { k: "note", ref: "", tx: [
-    "Las definiciones de wet white y wet blue no proceden del archivo sino de literatura técnica del sector del curtido; se han incorporado porque LAZZARI clasifica todos los cueros por ese criterio sin glosarlo nunca. Ningún otro dato del documento procede de fuera de la carpeta.",
-    "The definitions of wet white and wet blue do not come from the archive but from technical tanning literature; they were added because LAZZARI classifies every leather by that criterion without ever glossing it. No other datum in the document comes from outside the folder."
-  ]}
-]}
-
-]};
-
-/* ---- FUENTES ------------------------------------------------
-   file : ruta dentro del repositorio (sirve online y offline)
-   web  : dónde vive la fuente públicamente, cuando la hay
-   pages: "ia" si el sitio web admite ancla de página
-
-   FUENTES_LOCALES manda:
-     true  → usa los archivos del repo, con la página exacta.
-             Sólo si tenés derecho a publicarlos.
-     false → usa el enlace público (web) cuando existe.        */
 const FUENTES_LOCALES = false;
 
 const FUENTES = {
@@ -699,776 +2141,119 @@ const FUENTES = {
     web: "", pages: false },
   POELLINFO: {
     file: "archivo/poellinfo/",
-    web: "https://www.instagram.com/poellinfo/", pages: false }
+    web: "https://www.instagram.com/poellinfo/", pages: false },
+  WIKIPOELL: {
+    file: "fuentes/wikipoell/",
+    web: "", pages: false }
 };
 
-/* ---- ENLACES del documento original, por sección ---- */
 const LINKS = {
- "perfil": [
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "37 (2).jpg",
-   "label": "POELLINFO"
-  },
-  {
-   "k": "web",
-   "sig": "GRAILED",
-   "href": "https://www.grailed.com/drycleanonly/carol-christian-poell-master-class",
-   "label": "GRAILED"
-  }
+ "situacion": [
+  { "k": "web", "href": "https://www.carolchristianpoell.com/", "label": "SITIO OFICIAL", "hint": ["La web de la casa.", "The house website."] },
+  { "k": "img", "sig": "POELLINFO", "file": "37 (2).jpg", "label": "POELLINFO — serie 37, láminas 02, 04 y 06", "hint": ["Curtiduría y matadero.", "Tannery and slaughterhouse."] },
+  { "k": "pdf", "sig": "MICHEL", "page": 2, "label": "MICHEL — p. 1", "hint": ["Nacimiento y formación.", "Birth and training."] },
+  { "k": "web", "href": "https://www.grailed.com/drycleanonly/carol-christian-poell-master-class", "label": "GRAILED", "hint": ["La biografía larga y la anécdota japonesa.", "The long biography and the Japanese anecdote."] },
+  { "k": "pdf", "sig": "LEHMANN", "page": 178, "label": "LEHMANN — pp. 172-175", "hint": ["Por qué la moda prohíbe optimizar.", "Why fashion forbids optimising."] },
+  { "k": "pdf", "sig": "FASHIONNOW2", "page": 140, "label": "FASHIONNOW2 — pp. 138-139", "hint": ["La ficha de la anomalía.", "The anomaly profile."] },
+  { "k": "pdf", "sig": "LANDED", "page": 30, "label": "LANDED — p. 30", "hint": ["CCP entre sus contemporáneos.", "CCP among his contemporaries."] }
  ],
  "cronologia": [
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 14,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 13-19"
-  },
-  {
-   "k": "txt",
-   "sig": "POELLINFO",
-   "file": "Caption of jpg.txt",
-   "label": "POELLINFO · 36 entradas de POELLINFO"
-  }
+  { "k": "pdf", "sig": "MICHEL", "page": 14, "label": "MICHEL — pp. 13-19", "hint": ["Fechas de cada presentación.", "Dates of each presentation."] },
+  { "k": "txt", "sig": "POELLINFO", "file": "Caption of jpg.txt", "label": "POELLINFO — las 36 entradas", "hint": ["Cada colección por separado.", "Each collection separately."] },
+  { "k": "pdf", "sig": "LEHMANN", "page": 187, "label": "LEHMANN — p. 181", "hint": ["El corte de 2010.", "The 2010 cut-off."] },
+  { "k": "txt", "sig": "WIKIPOELL", "file": "ccp-room-garments.json", "label": "WIKIPOELL", "hint": ["502 prendas por código.", "502 garments by code."] }
  ],
- "metodo": [
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 178,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, pp. 172-183"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 11,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 10-12"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 185,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, pp. 179-182"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 186,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, p. 180"
-  },
-  {
-   "k": "web",
-   "sig": "OAC",
-   "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society",
-   "label": "OAC"
-  },
-  {
-   "k": "pdf",
-   "sig": "FASHIONNOW2",
-   "page": 141,
-   "file": "fashionnow2idsel0000unse_1.pdf",
-   "label": "FASHIONNOW2, p. 139"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "37 (3).jpg",
-   "label": "POELLINFO, lám. 03/10"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 181,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, pp. 175-178"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 182,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, p. 176"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 203,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, cap. «Primary Material»"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 183,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, pp. 177-190"
-  }
+ "poetica": [
+  { "k": "pdf", "sig": "LEHMANN", "page": 178, "label": "LEHMANN — pp. 172-183", "hint": ["Negación y Entziehung.", "Negation and Entziehung."] },
+  { "k": "pdf", "sig": "MICHEL", "page": 11, "label": "MICHEL — pp. 10-15", "hint": ["La lógica de las costuras.", "The logic of the seams."] },
+  { "k": "pdf", "sig": "MICHEL", "page": 22, "label": "MICHEL — pp. 21-23", "hint": ["Paradoja y literalidad.", "Paradox and literalism."] },
+  { "k": "pdf", "sig": "FASHIONNOW2", "page": 141, "label": "FASHIONNOW2 — p. 139", "hint": ["El cuestionario de Poell.", "Poell's questionnaire."] },
+  { "k": "img", "sig": "POELLINFO", "file": "1 (1).jpg", "label": "POELLINFO — c. 1 y c. 3", "hint": ["Los tres principios.", "The three principles."] },
+  { "k": "img", "sig": "POELLINFO", "file": "18 (1).jpg", "label": "POELLINFO — c. 18", "hint": ["La moda como herida.", "Fashion as a wound."] },
+  { "k": "web", "href": "https://corpstext.substack.com/p/accessory-abjection", "label": "KITCHELL", "hint": ["Kristeva, Hebdige, Bataille.", "Kristeva, Hebdige, Bataille."] },
+  { "k": "web", "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society", "label": "OAC", "hint": ["Byung-Chul Han; valor ganado.", "Byung-Chul Han; earned value."] }
  ],
- "tecnica": [
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 9,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 8-12"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 13,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 12-15"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "16 (1).jpg",
-   "label": "POELLINFO, c. 16"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "17 (1).jpg",
-   "label": "POELLINFO · c. 17"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 15,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 14-15"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "26 (1).jpg",
-   "label": "POELLINFO, c. 26"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "15 (1).jpg",
-   "label": "POELLINFO, c. 15"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "14 (1).jpg",
-   "label": "POELLINFO · c. 14"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 2,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, p. 1"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "22 (1).jpg",
-   "label": "POELLINFO, c. 22"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "8 (1).jpg",
-   "label": "POELLINFO · 8"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "17 (1).jpg",
-   "label": "POELLINFO · 17"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "22 (1).jpg",
-   "label": "POELLINFO · 22"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "28 (1).jpg",
-   "label": "POELLINFO · 28"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "36 (1).jpg",
-   "label": "POELLINFO · 36"
-  },
-  {
-   "k": "web",
-   "sig": "LAZZARI",
-   "href": "https://www.lazzariweb.it/en/blog/carol-christian-poell-online-guide-for-ccp-leather-shoes-and-garments-b18.html",
-   "label": "LAZZARI"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "5 (1).jpg",
-   "label": "POELLINFO, c. 5"
-  },
-  {
-   "k": "web",
-   "sig": "GRAILED",
-   "href": "https://www.grailed.com/drycleanonly/carol-christian-poell-master-class",
-   "label": "GRAILED"
-  },
-  {
-   "k": "web",
-   "sig": "LPA",
-   "href": "http://www.lepetitarchive.com/es/designerbio-carol-christian-poell-sus-grotescas-tecnicas/",
-   "label": "LPA"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "27 (1).jpg",
-   "label": "POELLINFO, c. 27"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "32 (1).jpg",
-   "label": "POELLINFO, c. 32"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "30 (1).jpg",
-   "label": "POELLINFO · c. 30"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=jhvCLa7S9Qs",
-   "label": "vídeo"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "9 (1).jpg",
-   "label": "POELLINFO, c. 9"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "10 (1).jpg",
-   "label": "POELLINFO, c. 10"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 183,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, p. 177"
-  },
-  {
-   "k": "web",
-   "sig": "KITCHELL",
-   "href": "https://corpstext.substack.com/p/accessory-abjection",
-   "label": "KITCHELL"
-  },
-  {
-   "k": "web",
-   "sig": "KITCHELL",
-   "href": "https://corpstext.substack.com/p/accessory-abjection",
-   "label": "KITCHELL — el ensayo completo"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "19 (1).jpg",
-   "label": "POELLINFO, c. 19"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "1 (1).jpg",
-   "label": "POELLINFO · c. 1"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 190,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, pp. 184-186"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "20 (1).jpg",
-   "label": "POELLINFO, c. 20"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 17,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, p. 16"
-  }
+ "genealogia": [
+  { "k": "pdf", "sig": "MICHEL", "page": 17, "label": "MICHEL — pp. 16-21", "hint": ["Accionismo y memoria.", "Actionism and memory."] },
+  { "k": "pdf", "sig": "MICHEL", "page": 10, "label": "MICHEL — pp. 9-10 y 22", "hint": ["Marx, Hegel y Kafka.", "Marx, Hegel and Kafka."] },
+  { "k": "pdf", "sig": "LEHMANN", "page": 185, "label": "LEHMANN — p. 179", "hint": ["Bernhard y el lenguaje.", "Bernhard and language."] },
+  { "k": "web", "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society", "label": "OAC", "hint": ["Arte Povera y Baudrillard.", "Arte Povera and Baudrillard."] },
+  { "k": "img", "sig": "POELLINFO", "file": "19 (1).jpg", "label": "POELLINFO — c. 1 y c. 19", "hint": ["Los originales militares.", "The military originals."] },
+  { "k": "img", "sig": "POELLINFO", "file": "37 (10).jpg", "label": "POELLINFO — serie 37, lámina 10", "hint": ["Poell sobre el Accionismo.", "Poell on Actionism."] }
  ],
- "estetica": [
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 13,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 12-15"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "35 (1).jpg",
-   "label": "POELLINFO, c. 35"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "18 (1).jpg",
-   "label": "POELLINFO, c. 18"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 22,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, p. 21"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "29 (1).jpg",
-   "label": "POELLINFO, c. 29"
-  },
-  {
-   "k": "web",
-   "sig": "OAC",
-   "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society",
-   "label": "OAC"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 22,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 21-23"
-  },
-  {
-   "k": "web",
-   "sig": "KITCHELL",
-   "href": "https://corpstext.substack.com/p/accessory-abjection",
-   "label": "KITCHELL"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 17,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 16-21"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 17,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 16-18 y 20-21"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 23,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, p. 22"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 185,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, p. 179"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 10,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, pp. 9-10"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "1 (1).jpg",
-   "label": "POELLINFO, c. 1"
-  }
+ "proceso": [
+  { "k": "pdf", "sig": "LEHMANN", "page": 181, "label": "LEHMANN — pp. 175-178", "hint": ["Taller y botas protésicas.", "Workshop and prosthetic boots."] },
+  { "k": "pdf", "sig": "LEHMANN", "page": 193, "label": "LEHMANN — pp. 187-190", "hint": ["El «Tanned Coat».", "The \"Tanned Coat\"."] },
+  { "k": "pdf", "sig": "LEHMANN", "page": 203, "label": "LEHMANN — pp. 197-226", "hint": ["Bonotto: telares y acabado.", "Bonotto: looms and finishing."] },
+  { "k": "img", "sig": "POELLINFO", "file": "29 (1).jpg", "label": "POELLINFO — c. 29", "hint": ["Object tanning en _Disjointed_.", "Object tanning in _Disjointed_."] },
+  { "k": "web", "href": "https://www.lazzariweb.it/en/blog/carol-christian-poell-online-guide-for-ccp-leather-shoes-and-garments-b18.html", "label": "LAZZARI", "hint": ["-PTC y -PCC.", "-PTC and -PCC."] }
+ ],
+ "materia": [
+  { "k": "pdf", "sig": "MICHEL", "page": 5, "label": "MICHEL — pp. 4-15", "hint": ["Las seis costuras, con imagen.", "The six seams, with images."] },
+  { "k": "web", "href": "https://www.lazzariweb.it/en/blog/carol-christian-poell-online-guide-for-ccp-leather-shoes-and-garments-b18.html", "label": "LAZZARI", "hint": ["Código, cueros y colores.", "Code, leathers, colours."] },
+  { "k": "txt", "sig": "WIKIPOELL", "file": "ccp-room-garments.json", "label": "WIKIPOELL — CCP-ROOM", "hint": ["502 códigos y composiciones.", "502 codes and compositions."] },
+  { "k": "txt", "sig": "WIKIPOELL", "file": "garments_backup_20260506_072451.json", "label": "WIKIPOELL — The Library", "hint": ["314 prendas y tejidos raros.", "314 garments, rare fabrics."] },
+  { "k": "img", "sig": "POELLINFO", "file": "8 (1).jpg", "label": "POELLINFO — c. 8, 17 y 22", "hint": ["Tejidos: SURFACE, KOAT, -EDGE.", "Fabrics: SURFACE, KOAT, -EDGE."] },
+  { "k": "img", "sig": "POELLINFO", "file": "16 (1).jpg", "label": "POELLINFO — c. 16", "hint": ["Self-Edge: el orillo.", "Self-Edge: the selvedge."] },
+  { "k": "img", "sig": "POELLINFO", "file": "14 (1).jpg", "label": "POELLINFO — c. 5 y 14", "hint": ["Transparente y perforado.", "Transparent and perforated."] },
+  { "k": "img", "sig": "POELLINFO", "file": "30 (1).jpg", "label": "POELLINFO — c. 20, 30 y 32", "hint": ["DARM, tornado, U-sole, drip.", "DARM, tornado, U-sole, drip."] },
+  { "k": "web", "href": "https://corpstext.substack.com/p/accessory-abjection", "label": "KITCHELL", "hint": ["Las cinco categorías.", "The five categories."] },
+  { "k": "pdf", "sig": "LEHMANN", "page": 190, "label": "LEHMANN — pp. 184-190", "hint": ["Fibra de vidrio y encurtido.", "Fibreglass and pickling."] }
  ],
  "obra": [
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "6 (1).jpg",
-   "label": "POELLINFO · 6"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "15 (1).jpg",
-   "label": "POELLINFO · 15"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "18 (1).jpg",
-   "label": "POELLINFO · 18"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "7 (1).jpg",
-   "label": "POELLINFO · 7"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 186,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, pp. 180-181"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 187,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, p. 181"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 182,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN, p. 176"
-  },
-  {
-   "k": "web",
-   "sig": "OAC",
-   "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society",
-   "label": "OAC"
-  },
-  {
-   "k": "pdf",
-   "sig": "LANDED",
-   "page": 30,
-   "file": "fashion2001lande0000unse_1.pdf",
-   "label": "LANDED, p. 30"
-  },
-  {
-   "k": "pdf",
-   "sig": "FASHIONNOW2",
-   "page": 140,
-   "file": "fashionnow2idsel0000unse_1.pdf",
-   "label": "FASHIONNOW2, p. 138"
-  }
+  { "k": "img", "sig": "POELLINFO", "file": "31 (1).jpg", "label": "POELLINFO — c. 31", "hint": ["El criterio de los espacios.", "The venue criterion."] },
+  { "k": "img", "sig": "POELLINFO", "file": "18 (3).jpg", "label": "POELLINFO — c. 18 y c. 6", "hint": ["Las dos presentaciones de 2000-2001.", "The two 2000-2001 presentations."] },
+  { "k": "img", "sig": "POELLINFO", "file": "15 (2).jpg", "label": "POELLINFO — c. 15", "hint": ["_Traditional Escape_: las piezas.", "_Traditional Escape_: the pieces."] },
+  { "k": "img", "sig": "POELLINFO", "file": "7 (1).jpg", "label": "POELLINFO — c. 7 y 21", "hint": ["El caballo curtido en objeto.", "The object-tanned horse."] },
+  { "k": "img", "sig": "POELLINFO", "file": "24 (1).jpg", "label": "POELLINFO — c. 24 y 22", "hint": ["FE-MALE AW 01-02 y el volumen.", "FE-MALE AW 01-02 and volume."] },
+  { "k": "pdf", "sig": "FLUX", "page": 7, "label": "FLUX — p. 7", "hint": ["Las piezas de _U-Turn_.", "The _U-Turn_ pieces."] },
+  { "k": "pdf", "sig": "MICHEL", "page": 18, "label": "MICHEL — pp. 17-19", "hint": ["Los escenarios.", "The venues."] },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=SJa80bzhENs", "label": "VÍDEO — Mainstream-Downstream", "hint": ["La presentación de 2004.", "The 2004 presentation."] },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=2wrXllsT54E", "label": "VÍDEO — Public Freedom", "hint": ["La perrera y los ladridos.", "The pound and the barking."] },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=fqwK7GIyYFM", "label": "VÍDEO — Traditional Escape", "hint": ["El descenso vendado.", "The blindfolded descent."] },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=ar9StobCWto", "label": "VÍDEO — Best Before", "hint": ["Cuero transparente en frigorífico.", "Transparent leather, cold room."] },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=yxUhoTy1jgU", "label": "VÍDEO — CCP · FE-MALE", "hint": ["El único sobre la línea de mujer.", "The only one on womenswear."] }
  ],
- "precisiones": [
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "27 (1).jpg",
-   "label": "POELLINFO, c. 27"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "3 (1).jpg",
-   "label": "POELLINFO, c. 3"
-  },
-  {
-   "k": "txt",
-   "sig": "POELLINFO",
-   "file": "Caption of jpg.txt",
-   "label": "POELLINFO"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 2,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL, p. 1"
-  },
-  {
-   "k": "img",
-   "sig": "POELLINFO",
-   "file": "20 (1).jpg",
-   "label": "POELLINFO, c. 20"
-  }
+ "recepcion": [
+  { "k": "pdf", "sig": "LEHMANN", "page": 182, "label": "LEHMANN — pp. 176-181", "hint": ["Lift y la ley de la visibilidad.", "Lift and the law of visibility."] },
+  { "k": "web", "href": "https://rawlooks.com/es/marca/carol-christian-poell/", "label": "NICHE", "hint": ["Tiendas y precios.", "Stores and prices."] },
+  { "k": "img", "sig": "POELLINFO", "file": "2 (1).jpg", "label": "POELLINFO — c. 2 y 12", "hint": ["Por qué desaparecen modelos.", "Why models disappear."] },
+  { "k": "web", "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society", "label": "OAC", "hint": ["Las réplicas del drip.", "The drip replicas."] },
+  { "k": "pdf", "sig": "MICHEL", "page": 24, "label": "MICHEL — pp. 23-24", "hint": ["Poell como sastre.", "Poell as a tailor."] },
+  { "k": "web", "href": "https://youtube.com/playlist?list=PLmxCy8jWOmcpab4upGjMOzCnAXBr0fF0K&si=g6W8KYoSGph_kx1G", "label": "VÍDEOS — playlist David Moseer", "hint": ["23 vídeos del canal.", "23 videos from the channel."] }
+ ],
+ "aparato": [
+  { "k": "img", "sig": "POELLINFO", "file": "27 (1).jpg", "label": "POELLINFO — c. 27", "hint": ["El bulo y la veteadura.", "The hoax and the veining."] },
+  { "k": "img", "sig": "POELLINFO", "file": "3 (1).jpg", "label": "POELLINFO — c. 3, 10 y 24", "hint": ["Correcciones del estudio.", "Studio corrections."] },
+  { "k": "img", "sig": "POELLINFO", "file": "20 (1).jpg", "label": "POELLINFO — c. 20", "hint": ["El material de la boa.", "The material of the boa."] },
+  { "k": "web", "href": "https://corpstext.substack.com/p/accessory-abjection", "label": "KITCHELL", "hint": ["Los ensayos pendientes.", "The pending essays."] },
+  { "k": "txt", "sig": "WIKIPOELL", "file": "README.md", "label": "WIKIPOELL — README", "hint": ["Por qué se ordena por parámetros.", "Why it is ordered by parameters."] }
  ],
  "biblio": [
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": null,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL · PDF"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 5,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL · costuras, p. 4"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 13,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL · vida y muerte, p. 12"
-  },
-  {
-   "k": "pdf",
-   "sig": "MICHEL",
-   "page": 17,
-   "file": "Carol Christian Poell/CCP Thought without Concept Christian MICHEL.pdf",
-   "label": "MICHEL · Accionismo, p. 16"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 178,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN · cap. C.C.P., p. 172"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 185,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN · Entziehung, p. 179"
-  },
-  {
-   "k": "pdf",
-   "sig": "LEHMANN",
-   "page": 203,
-   "file": "Carol Christian Poell/fashion-and-materialism-9781474407922_compress.pdf",
-   "label": "LEHMANN · Bonotto, p. 197"
-  },
-  {
-   "k": "txt",
-   "sig": "POELLINFO",
-   "file": "Caption of jpg.txt",
-   "label": "POELLINFO · todas las entradas"
-  },
-  {
-   "k": "folder",
-   "sig": "POELLINFO",
-   "file": "",
-   "label": "POELLINFO · carpeta de imágenes"
-  },
-  {
-   "k": "web",
-   "sig": "KITCHELL",
-   "href": "https://corpstext.substack.com/p/accessory-abjection",
-   "label": "KITCHELL · ensayo"
-  },
-  {
-   "k": "web",
-   "sig": "LAZZARI",
-   "href": "https://www.lazzariweb.it/en/blog/carol-christian-poell-online-guide-for-ccp-leather-shoes-and-garments-b18.html",
-   "label": "LAZZARI · guía"
-  },
-  {
-   "k": "web",
-   "sig": "OAC",
-   "href": "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society",
-   "label": "OAC · estudio"
-  },
-  {
-   "k": "web",
-   "sig": "GRAILED",
-   "href": "https://www.grailed.com/drycleanonly/carol-christian-poell-master-class",
-   "label": "GRAILED · artículo"
-  },
-  {
-   "k": "web",
-   "sig": "NICHE",
-   "href": "https://rawlooks.com/es/marca/carol-christian-poell/",
-   "label": "NICHE · ficha"
-  },
-  {
-   "k": "web",
-   "sig": "LPA",
-   "href": "http://www.lepetitarchive.com/es/designerbio-carol-christian-poell-sus-grotescas-tecnicas/",
-   "label": "LPA · ficha"
-  },
-  {
-   "k": "pdf",
-   "sig": "FLUX",
-   "page": 7,
-   "file": "Carol Christian Poell/Carol Christian Poell.pdf",
-   "label": "FLUX · editorial, p. 7"
-  },
-  {
-   "k": "pdf",
-   "sig": "FASHIONNOW2",
-   "page": 140,
-   "file": "fashionnow2idsel0000unse_1.pdf",
-   "label": "FASHIONNOW2 · ficha, p. 138"
-  },
-  {
-   "k": "pdf",
-   "sig": "FASHIONNOW2",
-   "page": 141,
-   "file": "fashionnow2idsel0000unse_1.pdf",
-   "label": "FASHIONNOW2 · cuestionario, p. 139"
-  },
-  {
-   "k": "pdf",
-   "sig": "LANDED",
-   "page": 30,
-   "file": "fashion2001lande0000unse_1.pdf",
-   "label": "LANDED · lista, p. 30"
-  },
-  {
-   "k": "pdf",
-   "sig": "LANDED",
-   "page": 173,
-   "file": "fashion2001lande0000unse_1.pdf",
-   "label": "LANDED · ficha, p. 173"
-  },
-  {
-   "k": "pdf",
-   "sig": "MANUAL",
-   "page": null,
-   "file": "moda-historia-de-los-disenos-y-estilos.pdf",
-   "label": "manual"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=SJa80bzhENs",
-   "label": "Mainstream-Downstream"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=ar9StobCWto",
-   "label": "Best Before"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=2wrXllsT54E",
-   "label": "Public Freedom"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=fqwK7GIyYFM",
-   "label": "Traditional Escape"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=khAu5juQ984",
-   "label": "Off-Scene"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=5YEpG4FBXhw",
-   "label": "Trigger"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=jhvCLa7S9Qs",
-   "label": "Crushable Shoes"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=s68UjXyxcO0",
-   "label": "A Conversation"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=_QFHsSMZFAY",
-   "label": "Bliss Foster"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=YJbhGqzEqTY",
-   "label": "Kroening"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=ssZxvmapYEc",
-   "label": "wrong trousers"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=v0MDX5d4a-o",
-   "label": "en español"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=yxUhoTy1jgU",
-   "label": "FE-MALE"
-  },
-  {
-   "k": "video",
-   "href": "https://www.youtube.com/watch?v=xFmqVjPm55o",
-   "label": "Archive collection"
-  },
-  {
-   "k": "video",
-   "href": "https://vimeo.com/418320091",
-   "label": "CCP Collective"
-  },
-  {
-   "k": "video",
-   "href": "https://vimeo.com/4841613",
-   "label": "CCP 0"
-  },
-  {
-   "k": "video",
-   "href": "https://vimeo.com/4861175",
-   "label": "Disjointed in Lift"
-  },
-  {
-   "k": "video",
-   "href": "https://vimeo.com/1085278585",
-   "label": "x Library I"
-  },
-  {
-   "k": "video",
-   "href": "https://vimeo.com/1085278684",
-   "label": "II"
-  },
-  {
-   "k": "clip",
-   "sig": "POELLINFO",
-   "file": "10 (1).mp4",
-   "label": "POELLINFO · prótesis"
-  },
-  {
-   "k": "clip",
-   "sig": "POELLINFO",
-   "file": "15 (1).mp4",
-   "label": "POELLINFO · Traditional Escape"
-  },
-  {
-   "k": "clip",
-   "sig": "POELLINFO",
-   "file": "28 (1).mp4",
-   "label": "POELLINFO · la muda"
-  },
-  {
-   "k": "clip",
-   "sig": "POELLINFO",
-   "file": "35 (1).mp4",
-   "label": "POELLINFO · la gorguera"
-  }
+  { "k": "video", "href": "https://www.youtube.com/watch?v=SJa80bzhENs", "label": "Mainstream-Downstream" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=ar9StobCWto", "label": "Best Before (remaster 2022)" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=2wrXllsT54E", "label": "Public Freedom" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=fqwK7GIyYFM", "label": "Traditional Escape" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=khAu5juQ984", "label": "Off-Scene" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=5YEpG4FBXhw", "label": "Trigger" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=jhvCLa7S9Qs", "label": "Crushable Shoes" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=0PzYKZaDVDY", "label": "CCP (2020)" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=s68UjXyxcO0", "label": "A Conversation · David Moseer" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=_QFHsSMZFAY", "label": "Complete Guide to Mainstream Downstream · Bliss Foster" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=YJbhGqzEqTY", "label": "Understanding CCP · Karsten Kroening" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=ssZxvmapYEc", "label": "The Edgiest Fashion Designer · wrong trousers" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=v0MDX5d4a-o", "label": "Las locuras de CCP · Jasb13r" },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=yxUhoTy1jgU", "label": "CCP · FE-MALE · SAMSA G." },
+  { "k": "video", "href": "https://www.youtube.com/watch?v=xFmqVjPm55o", "label": "Archive collection · Polo Cheng" },
+  { "k": "video", "href": "https://vimeo.com/418320091", "label": "CCP Collective · Zika Liu" },
+  { "k": "video", "href": "https://vimeo.com/4841613", "label": "CCP 0 · Lift blog" },
+  { "k": "video", "href": "https://vimeo.com/4861175", "label": "Disjointed in Lift" },
+  { "k": "video", "href": "https://vimeo.com/1085278585", "label": "CCP x Library I · Ida May" },
+  { "k": "video", "href": "https://vimeo.com/1085278684", "label": "CCP x Library II · Ida May" },
+  { "k": "clip", "sig": "POELLINFO", "file": "10 (1).mp4", "label": "POELLINFO · prótesis" },
+  { "k": "clip", "sig": "POELLINFO", "file": "15 (1).mp4", "label": "POELLINFO · el descenso por la ventana" },
+  { "k": "clip", "sig": "POELLINFO", "file": "28 (1).mp4", "label": "POELLINFO · la muda del KITE-S" },
+  { "k": "clip", "sig": "POELLINFO", "file": "35 (1).mp4", "label": "POELLINFO · la gorguera" }
  ]
 };
 
@@ -1479,15 +2264,73 @@ let cur = 0;
 
 const L = v => Array.isArray(v) ? (lang === "es" ? v[0] : v[1]) : v;
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const E = v => esc(L(v));
+/* markdown mínimo, sólo para el cuerpo del texto: **fuerte**, _cursiva_,
+   `código`. Escapa primero y recién ahí mete las etiquetas, así que
+   nunca abre una inyección — y el contenido viejo, sin esta sintaxis,
+   pasa exactamente igual que antes.                                */
+const md = s => esc(s)
+  .replace(/`([^`]+)`/g, "<code>$1</code>")
+  .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>")
+  .replace(/_([^_]+)_/g, "<em>$1</em>")
+  .replace(/(https?:\/\/[^\s<]+)/g, `<a href="$1" target="_blank" rel="noopener">$1</a>`);
+const E = v => md(L(v));
+
+/* instrucción 3 — de las quince figuras: nueve contrapuestas al
+   párrafo (TIGHT, texto encima), cuatro del lado derecho sin
+   superponerse (RIGHT) y dos en tratamiento normal (ninguno de los
+   dos sets). Aparte, COLGROUPS parte cinco subtemas puntuales en
+   dos columnas de diario — no tiene por qué coincidir con TIGHT,
+   son dos decisiones independientes. El resto queda corrido.       */
+const TIGHT = new Set([
+  "archivo/poellinfo/18-three-refrigerated-cells-2000-la-terce.jpg",
+  "archivo/poellinfo/19-multi-dimensional-bag-el-marco-de-prec.jpg",
+  "archivo/poellinfo/10-bota-protesica-el-titanio-revelado-al.jpg",
+  "archivo/poellinfo/17-prenda-self-edge-el-orillo-a-la-vista.jpg",
+  "archivo/poellinfo/24-fe-male-aw-01-02.jpg",
+  "archivo/poellinfo/9-collar-de-dientes-mm1480-protesis-dent.jpg",
+  "archivo/poellinfo/33-visible-overlock-seam-sobre-cuero-pali.jpg",
+  "archivo/poellinfo/26-genealogia-del-pantalon-retorcido-del.jpg",
+  "archivo/poellinfo/7-el-caballo-curtido-en-objeto-cosido-co.jpg"
+]);
+const RIGHT = new Set([
+  "archivo/poellinfo/14-cuero-perforado-de-off-scene-ss-08-tem.jpg",
+  "archivo/poellinfo/8-cuello-y-canto-en-surface-la-rigidez-q.jpg",
+  "archivo/poellinfo/15-traditional-escape-ss-02-el-descenso-c.jpg",
+  "archivo/poellinfo/5-cuero-transparente-piel-adelgazada-has.jpg"
+]);
+const COLGROUPS = new Set([
+  "poetica|Vida y muerte · soberanía animal",
+  "genealogia|Referencialidad: militaria y medicina",
+  "proceso|Los procesos invertidos",
+  "materia|Sastrería · estructura, Self-Edge y Dead-End",
+  "obra|FE-MALE y la silueta"
+]);
+
+/* enlace correspondiente para cada sigla de la bibliografía — mismo
+   FUENTES que usan los links de cada tema; las siglas que no viven
+   ahí (reseñas y notas de prensa) van directo a su URL pública.     */
+const BIBLIO_WEB = {
+  KITCHELL: "https://corpstext.substack.com/p/accessory-abjection",
+  LAZZARI: "https://www.lazzariweb.it/en/blog/carol-christian-poell-online-guide-for-ccp-leather-shoes-and-garments-b18.html",
+  OAC: "https://www.objectsofaffectioncollection.com/studies/carol-christian-poell-the-alchemical-designer-post-luxurys-radical-critique-of-materiality-and-the-smooth-society",
+  GRAILED: "https://www.grailed.com/drycleanonly/carol-christian-poell-master-class",
+  NICHE: "https://rawlooks.com/es/marca/carol-christian-poell/",
+  LPA: "http://www.lepetitarchive.com/es/designerbio-carol-christian-poell-sus-grotescas-tecnicas/"
+};
+function bibHref(sig) {
+  if (BIBLIO_WEB[sig]) return BIBLIO_WEB[sig];
+  const s = sig === "(contexto)" ? "MANUAL" : sig;
+  const f = FUENTES[s];
+  if (!f) return "";
+  return href({ k: "pdf", sig: s, page: null });
+}
 
 /* ---- bloques ---- */
-function blocks(list) {
+function blocks(list, sectionId) {
   return `<div class="b">` + list.map(b => {
     switch (b.k) {
-      case "sub": return `<h3>${E(b.tx)}</h3>`;
-      case "p": return `<p>${E(b.tx)}</p>`;
-      case "note": return `<p class="note">${E(b.tx)}</p>`;
+      case "sub": return `<h3${COLGROUPS.has(sectionId + "|" + b.tx[0]) ? ` class="grp-start"` : ""}>${E(b.tx)}</h3>`;
+      case "p": case "note": return `<ul class="bp"><li>${E(b.tx)}</li></ul>`;
       case "fields": return `<dl>${b.rows.map(([k, v]) => `<div><dt>${E(k)}</dt><dd>${E(v)}</dd></div>`).join("")}</dl>`;
       case "entries": return `<dl>${b.rows.map(([k, v, r, img]) => `<div><dt>${E(k)}</dt><dd>${E(v)}${img ? `<figure class="ex"><img src="${esc(img)}" alt="${E(k)}" loading="lazy"><figcaption><a href="https://www.instagram.com/poellinfo/" target="_blank" rel="noopener">@poellinfo ↗</a></figcaption></figure>` : ""}</dd></div>`).join("")}</dl>`;
       case "timeline": return `<div class="scroll"><table class="tl"><tbody>${b.rows.map(([d, t, v]) =>
@@ -1499,8 +2342,10 @@ function blocks(list) {
         <p class="note">${E(b.tail)}</p></div>`;
       case "colors": return `<h3>${E(b.tx)}</h3><div class="colors">${b.rows.map(([c, hex, n]) =>
         `<div><i style="background:${hex}"></i><span><b>${esc(c)}</b> ${E(n)}</span></div>`).join("")}</div><p class="note">${E(b.note)}</p>`;
-      case "sources": return `<div class="sources">${b.rows.map(([sg, ref, desc]) =>
-        `<div><span class="sg">${esc(sg)}</span><span>${E(ref)}</span><span class="st">${E(desc)}</span></div>`).join("")}</div>`;
+      case "sources": return `<div class="sources">${b.rows.map(([sg, ref, desc]) => { const h = bibHref(sg);
+        return `<div><span class="sg">${h ? `<a href="${esc(h)}" target="_blank" rel="noopener">${esc(sg)}</a>` : esc(sg)}</span><span>${E(ref)}</span><span class="st">${E(desc)}</span></div>`; }).join("")}</div>`;
+      case "figure": { const cls = TIGHT.has(b.src) ? " tight" : RIGHT.has(b.src) ? " right" : "";
+        return `<figure class="fig${cls}"${b.ref ? ` title="${esc(b.ref)}"` : ""}><img src="${esc(b.src)}" alt="${E(b.cap)}" loading="lazy"><figcaption>${E(b.cap)}</figcaption></figure>`; }
       default: return "";
     }
   }).join("") + `</div>`;
@@ -1560,7 +2405,8 @@ function linksOf(id) {
     <h3>${lang === "es" ? "Enlaces" : "Links"} · ${docs.length}</h3>
     <ul>${docs.map(it => {
       const loc = isLocal(it);
-      return `<li><a href="${esc(href(it))}" target="_blank" rel="noopener"${loc && !OFFLINE_OK ? ` data-local="1" title="${warn}"` : ""}><span class="ar">→</span>${esc(it.label)}</a></li>`;
+      const tip = loc && !OFFLINE_OK ? warn : (it.hint ? L(it.hint) : "");
+      return `<li><a href="${esc(href(it))}" target="_blank" rel="noopener"${loc && !OFFLINE_OK ? ` data-local="1"` : ""}${tip ? ` title="${esc(tip)}"` : ""}><span class="ar">→</span>${esc(it.label)}</a></li>`;
     }).join("")}</ul></div>`;
   if (vids.length) out += `<div class="links vids">
     <h3>${lang === "es" ? "Vídeos" : "Videos"} · ${vids.length}</h3>
@@ -1584,7 +2430,7 @@ function cover() {
    horizontal, ni relleno animado al pasar el mouse.                */
 function strip() {
   const items = CCP.sections.map((s, i) =>
-    `<li><a href="#s-${esc(s.id)}" data-sec="${i}" aria-current="${i === cur}"><span class="n">${esc(s.n)}</span>${E(s.t)}</a></li>`
+    `<li><a href="#s-${esc(s.id)}" data-sec="${i}" aria-current="${i === cur}"><span class="n">${esc(s.n)}</span>-${E(s.t)}</a></li>`
   ).join("");
   return `<nav class="idxbar" aria-label="${E(UI.contents)}">
     <a class="idx-home" href="#" data-open="index">← ${E(UI.designers)}</a>
@@ -1605,10 +2451,25 @@ function file() {
       ${strip()}
       <div class="pad body">
         ${CCP.sections.map(s => `<section class="sec" id="s-${s.id}">
-          <h2><span class="n">${esc(s.n)}</span>${E(s.t)}</h2>${blocks(s.blocks)}${linksOf(s.id)}</section>`).join("")}
+          <h2><span class="n">${esc(s.n)}</span>-${E(s.t)}</h2>${blocks(s.blocks, s.id)}${linksOf(s.id)}</section>`).join("")}
       </div>
     </div>
   </article>`;
+}
+
+/* junta, en un <div class="grp">, todo lo que sigue a un h3.grp-start
+   hasta el próximo h3 (o el final del tema): así ese tramo se puede
+   partir en columnas sin tocar cómo blocks() arma el resto.        */
+function groupColumns() {
+  document.querySelectorAll(".b h3.grp-start").forEach(h3 => {
+    const wrap = document.createElement("div");
+    wrap.className = "grp";
+    const toMove = [];
+    let n = h3.nextElementSibling;
+    while (n && n.tagName !== "H3") { toMove.push(n); n = n.nextElementSibling; }
+    h3.after(wrap);
+    toMove.forEach(el => wrap.appendChild(el));
+  });
 }
 
 /* ---- pintar ---- */
@@ -1630,6 +2491,7 @@ function paint(top) {
   const el = document.getElementById("view");
   const y = top ? 0 : window.scrollY;
   el.innerHTML = view === "index" ? cover() : file();
+  groupColumns();
   window.scrollTo({ top: y, behavior: "instant" });
   spy();
   centerStrip();
@@ -1784,7 +2646,7 @@ function applyTextGlitch() {
   // nombre — la funcionalidad sigue viva, pero casi no se nota
   // (la opacidad queda resuelta en CSS, por vista).
   const candidates = view === "ccp"
-    ? [...document.querySelectorAll(".b p, .b dd")].filter(el => el.textContent.trim().length > 30 && !el.querySelector(".ex"))
+    ? [...document.querySelectorAll(".b ul.bp li, .b dd")].filter(el => el.textContent.trim().length > 30 && !el.querySelector(".ex"))
     : [...document.querySelectorAll(".designer")].filter(el => el.textContent.trim().length > 3);
   const n = view === "ccp" ? Math.min(candidates.length, 8 + Math.floor(Math.random() * 7)) : Math.min(candidates.length, 1);
   for (let i = 0; i < n; i++) {
@@ -1848,7 +2710,7 @@ document.addEventListener("click", e => {
     const s = fig.dataset.src;
     pl.outerHTML = fig.dataset.kind === "clip"
       ? `<video src="${s}" controls autoplay playsinline></video>`
-      : `<iframe src="${s}" title="${pl.getAttribute("aria-label")}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;
+      : `<iframe src="${s}" title="${pl.getAttribute("aria-label")}" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>`;
     return;
   }
   const o = e.target.closest("[data-open]");
