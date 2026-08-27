@@ -5,6 +5,9 @@ método, técnica, obra y bibliografía, en español e inglés.
 
 Primer diseñador publicado: **Carol Christian Poell**. Kei Kagami, en preparación.
 
+**En vivo:** <https://alberto-balsalm-47.github.io/Projects/> — no hace falta
+clonar ni correr nada; se reconstruye solo con cada push a `main`.
+
 ## Estructura
 
 ```
@@ -18,8 +21,9 @@ No usa webfonts, ni librerías, ni build. Se abre igual desde el disco
 
 ## Publicar
 
-Settings → Pages → Source: **Deploy from a branch** → rama `main`, carpeta `/ (root)`.
-En un minuto queda en `https://USUARIO.github.io/REPOSITORIO/`.
+Ya está activado: Settings → Pages → Source **Deploy from a branch**, rama
+`main`, carpeta `/ (root)`. Cada push a `main` publica en un minuto en
+<https://alberto-balsalm-47.github.io/Projects/>.
 
 ## Las fuentes
 
