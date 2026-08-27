@@ -7,17 +7,19 @@
 
 <style>
 /* =========================================================
-   ÍNDICE DE DISEÑADORES · v3
-   Ficha = F2 + F4 con el índice en horizontal.
-   Tres estilos de índice × dos modos de lectura.
-   Courier New Bold (Faxfont Standard primero). Sin webfonts.
+   ÍNDICE DE DISEÑADORES
+   Portada con la lista de diseñadores (DESIGNERS) + una ficha
+   por autor, armada en bloques (función blocks(), más abajo en
+   el script) a partir de los datos de CCP. Índice de la ficha:
+   columna fija a la izquierda, lectura continua.
+   Courier New Bold (Faxfont Standard primero). Sin webfonts,
+   sin build — se abre igual desde el disco que servido.
    ========================================================= */
 
 :root {
   --type: "Faxfont Standard", "Courier New", Courier, monospace;
   --bg: #ffffff;
   --fg: #050505;
-  --fg2: #3a3a3a;
   --dim: #6e6e6e;
   /* ancla clásica de navegador: azul, igual en toda la página —
      ficha y portada, claro y oscuro — y se mantiene igual visitada. */
@@ -34,7 +36,7 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
+    --bg: #060606; --fg: #f2f2ee; --dim: #97968f;
     --lnk: #6d93ff;
     --line: #47463e; --line2: #221f18;
     --glitch-top: #dedad0; --glitch-mid: #8f8b81; --glitch-bot: #141210;
@@ -42,7 +44,7 @@
   }
 }
 :root[data-theme="dark"] {
-  --bg: #060606; --fg: #f2f2ee; --fg2: #c4c4bd; --dim: #97968f;
+  --bg: #060606; --fg: #f2f2ee; --dim: #97968f;
   --lnk: #6d93ff;
   --line: #47463e; --line2: #221f18;
   --glitch-top: #dedad0; --glitch-mid: #8f8b81; --glitch-bot: #141210;
@@ -251,6 +253,13 @@ body[data-view="index"] .glitch-line::before, body[data-view="index"] .glitch-li
    columnas de la instrucción 3, más abajo).                        */
 .b ul.bp { list-style-type: "- "; margin: 0 0 1rem; padding-left: 1.3em; max-width: var(--measure); }
 .b ul.bp li::marker { color: var(--dim); }
+
+/* dl/dt/dd, .anat y .colors, de acá hasta .sources: vocabulario de
+   blocks() (fields · entries · label · colors) que CCP no usa hoy
+   —toda su ficha son sub · p/note · table · figure · sources—, pero
+   sigue siendo el que arma una ficha nueva (ver blocks() y README:
+   "agregar un diseñador es agregar un objeto a DESIGNERS y su
+   ficha"). No es código muerto: está dormido a propósito.          */
 /* la columna es real: en pantalla ancha, las entradas de cada tema
    se acomodan en dos columnas de diario, no en una sola tira larga. */
 .b dl { margin: 0; max-width: 96ch; column-width: 22rem; column-gap: 2.2rem; }
@@ -396,35 +405,16 @@ body[data-view="index"] .glitch-line::before, body[data-view="index"] .glitch-li
 /* Contenido real, extraído de "Carol Christian Poell — Documento de estudio".
    Cada string es un par [español, inglés]. */
 
+/* sólo lo que blocks()/cover()/strip() realmente leen — ver
+   grep "UI\." antes de agregar una clave que nadie use.        */
 const UI = {
-  siteName: ["Índice de diseñadores", "Index of designers"],
-  siteSub: ["Guía de moda · documento de estudio", "Fashion guide · study document"],
-  siteBlurb: [
-    "Fichas de autor construidas sobre archivo: método, técnica, obra y bibliografía. Cada entrada da lo mínimo para entender el concepto y remite a la fuente donde está desarrollado.",
-    "Author files built from archive material: method, technique, work and bibliography. Each entry gives the minimum needed to grasp the concept and points to the source where it is developed."
-  ],
   designers: ["Diseñadores", "Designers"],
-  index: ["Índice", "Index"],
-  back: ["Volver al índice", "Back to index"],
-  open: ["abrir", "open"],
-  soon: ["en preparación", "in preparation"],
-  ready: ["publicado", "published"],
-  contents: ["Contenido", "Contents"],
-  lang: ["Idioma", "Language"],
-  sources: ["Fuentes", "Sources"],
-  entries: ["entradas", "entries"],
-  section: ["sección", "section"],
-  sectionsWord: ["secciones", "sections"],
-  filter: ["Filtrar", "Filter"],
-  all: ["todo", "all"],
-  loading: ["cargando", "loading"],
-  note: ["Nota", "Note"],
-  sigla: ["Las siglas remiten a la bibliografía final.", "Abbreviations refer to the bibliography at the end."]
+  contents: ["Contenido", "Contents"]
 };
 
 const DESIGNERS = [
-  { id: "ccp", code: "01", name: "Carol Christian Poell", years: "1966 —", place: ["Linz / Milán", "Linz / Milan"], line: ["MALE · FE-MALE", "MALE · FE-MALE"], ready: true },
-  { id: "kagami", code: "02", name: "Kei Kagami", years: "1962 —", place: ["Tokio / Londres", "Tokyo / London"], line: ["—", "—"], ready: false }
+  { id: "ccp", name: "Carol Christian Poell", ready: true },
+  { id: "kagami", name: "Kei Kagami", ready: false }
 ];
 
 const CCP = {
@@ -2324,14 +2314,19 @@ function bibHref(sig) {
   return href({ k: "pdf", sig: s, page: null });
 }
 
-/* ---- bloques ---- */
+/* ---- bloques ----
+   Vocabulario completo de la ficha. La de CCP sólo usa sub, p/note,
+   table, figure y sources; fields/entries/timeline/label/colors
+   quedan para el próximo diseñador (ver el mismo aviso en el CSS,
+   arriba de .b dl) — no son casos muertos, son los que todavía no
+   tienen datos.                                                    */
 function blocks(list, sectionId) {
   return `<div class="b">` + list.map(b => {
     switch (b.k) {
       case "sub": return `<h3${COLGROUPS.has(sectionId + "|" + b.tx[0]) ? ` class="grp-start"` : ""}>${E(b.tx)}</h3>`;
       case "p": case "note": return `<ul class="bp"><li>${E(b.tx)}</li></ul>`;
       case "fields": return `<dl>${b.rows.map(([k, v]) => `<div><dt>${E(k)}</dt><dd>${E(v)}</dd></div>`).join("")}</dl>`;
-      case "entries": return `<dl>${b.rows.map(([k, v, r, img]) => `<div><dt>${E(k)}</dt><dd>${E(v)}${img ? `<figure class="ex"><img src="${esc(img)}" alt="${E(k)}" loading="lazy"><figcaption><a href="https://www.instagram.com/poellinfo/" target="_blank" rel="noopener">@poellinfo ↗</a></figcaption></figure>` : ""}</dd></div>`).join("")}</dl>`;
+      case "entries": return `<dl>${b.rows.map(([k, v, , img]) => `<div><dt>${E(k)}</dt><dd>${E(v)}${img ? `<figure class="ex"><img src="${esc(img)}" alt="${E(k)}" loading="lazy"><figcaption><a href="https://www.instagram.com/poellinfo/" target="_blank" rel="noopener">@poellinfo ↗</a></figcaption></figure>` : ""}</dd></div>`).join("")}</dl>`;
       case "timeline": return `<div class="scroll"><table class="tl"><tbody>${b.rows.map(([d, t, v]) =>
         `<tr><td>${esc(d)}</td><td>${E(t)}</td><td>${E(v)}</td></tr>`).join("")}</tbody></table></div>`;
       case "table": return `<div class="scroll"><table><thead><tr>${b.head.map(h => `<th>${E(h)}</th>`).join("")}</tr></thead><tbody>${
